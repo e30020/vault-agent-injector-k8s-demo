@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vault-init
+spec:
+  template:
+    spec:
+      serviceAccountName: vault
+      restartPolicy: OnFailure
+      containers:
+        - name: vault-init
+          image: hashicorp/vault:1.15.4
+          env:
+            - name: VAULT_TOKEN
+              value: "root"
+          volumeMounts:
+            - name: sql-volume
+              mountPath: /tmp/sql
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              export VAULT_ADDR=http://vault.default.svc:8200
+
+              vault auth enable kubernetes || true
+
+              vault write auth/kubernetes/config \
+                token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+                kubernetes_host="https://${KUBERNETES_PORT_443_TCP_ADDR}:443" \
+                kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+              echo 'path "database/creds/readonly-role" { capabilities = ["read"] }' > /tmp/myapp-policy.hcl
+              vault policy write myapp-policy /tmp/myapp-policy.hcl
+
+              vault write auth/kubernetes/role/myapp-role \
+                bound_service_account_names=vault \
+                bound_service_account_namespaces=default \
+                policies=myapp-policy \
+                ttl=1h
+
+              vault secrets enable database || true
+
+              vault write database/config/my-postgres-db \
+                plugin_name=postgresql-database-plugin \
+                allowed_roles=readonly-role \
+                connection_url="postgresql://{{username}}:{{password}}@postgres:5432/demo?sslmode=disable" \
+                username="vaultadmin" \
+                password="password"
+
+              vault write database/roles/readonly-role \
+                db_name=my-postgres-db \
+                default_ttl="5" \
+                max_ttl="30" \
+                creation_statements=@/tmp/sql/readonly-role.sql
+      volumes:
+        - name: sql-volume
+          configMap:
+            name: readonly-role-sql

@@ -1,0 +1,148 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app
+  labels:
+    app: demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-app
+  template:
+    metadata:
+      labels:
+        app: demo-app
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "myapp-role"
+        vault.hashicorp.com/agent-inject-secret-db-creds: "database/creds/readonly-role"
+        vault.hashicorp.com/agent-inject-template-db-creds: |
+          {{- with secret "database/creds/readonly-role" -}}
+          DB_USER={{ .Data.username }}
+          DB_PASSWORD={{ .Data.password }}
+          {{- end }}
+        vault.hashicorp.com/agent-pre-populate: "true"
+        vault.hashicorp.com/agent-init-first: "true"
+    spec:
+      serviceAccountName: vault
+      containers:
+        - name: app
+          image: python:3.10-slim
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              pip install flask psycopg2-binary;
+
+              cat <<EOF > app.py
+              from flask import Flask
+              import psycopg2
+              import os
+              import time
+              from datetime import datetime
+
+              app = Flask(__name__)
+
+              @app.route("/")
+              def show_messages():
+                  try:
+                      creds = {}
+                      secret_path = "/vault/secrets/db-creds"
+                      with open(secret_path, "r") as f:
+                          for line in f:
+                              if "=" in line:
+                                  key, value = line.strip().split("=", 1)
+                                  creds[key] = value
+
+                      updated_epoch = os.path.getmtime(secret_path)
+                      updated_str = datetime.fromtimestamp(updated_epoch).strftime('%Y-%m-%d %H:%M:%S')
+
+                      ttl_seconds = 30
+                      elapsed = int(time.time() - updated_epoch)
+                      remaining = max(ttl_seconds - elapsed, 0)
+
+                      conn = psycopg2.connect(
+                          dbname="demo",
+                          user=creds.get("DB_USER"),
+                          password=creds.get("DB_PASSWORD"),
+                          host="postgres",
+                          port=5432
+                      )
+                      cur = conn.cursor()
+                      cur.execute("SELECT * FROM messages;")
+                      rows = cur.fetchall()
+                      cur.close()
+                      conn.close()
+
+                      table = "".join(f"<tr><td>{r[0]}</td><td>{r[1]}</td></tr>" for r in rows)
+                      return f"""
+                      <html>
+                      <head>
+                        <meta http-equiv="refresh" content="1">
+                        <style>
+                          body {{ font-family: Arial, sans-serif; }}
+                          table {{ border-collapse: collapse; width: 60%; }}
+                          th, td {{ border: 1px solid #ccc; padding: 8px; }}
+                          th {{ background-color: #f2f2f2; }}
+                          .section {{ margin-bottom: 30px; }}
+                        </style>
+                      </head>
+                      <body>
+                      <div class="section">
+                        <h2>🔧 Vault Agent Injector の裏側の動作</h2>
+                        <ul>
+                      <div class="section">
+                        <h2>🔧 Vault Agent Injector の裏側の動作</h2>
+                        <ul>
+                            <li>✅ <strong>アプリケーション Pod の起動時</strong>、<strong>Vault Agent</strong> が Sidecar コンテナとして自動的に起動</li>
+                            <li>✅ Kubernetes の標準機能で自動マウントされた <code>/var/run/secrets/kubernetes.io/serviceaccount/token</code> の JWT を使用し、<strong>Vault Agent</strong> が Vault の Kubernetes Auth Method にログイン</li>
+                            <li>✅ <strong>Vault Agent がログイン後に取得した Vault Token</strong> は、メモリ上に安全に保持（ファイルには保存されない構成）</li>
+                            <li>✅ <strong>Vault Agent が</strong>、Vault Token を使って <code>database/creds/readonly-role</code> から動的な DB 認証情報（Secret）を取得</li>
+                            <li>✅ <strong>アプリケーション Pod 内の Vault Agent Sidecar コンテナが</strong> テンプレートエンジンで Secret を整形し、<strong>共有ボリューム上の <code>/vault/secrets/db-creds</code></strong> にファイル出力</li>
+                            <li>🔁 <strong>Secret の TTL が切れると、Vault Agent が自動的に再取得・ファイル再生成</strong>（アプリケーションは再起動不要）</li>
+                        </ul>
+                      </div>
+                        </ul>
+                      </div>
+
+                      <div class="section">
+                        <h2>📂 Secret ファイルの状態</h2>
+                        <ul>
+                          <li><b>ファイルパス:</b> /vault/secrets/db-creds</li>
+                          <li><b>最終更新日時:</b> {updated_str}</li>
+                          <li><b>TTL 残り秒数:</b> {remaining} 秒</li>
+                          <li><b>DB_USER:</b> {creds.get("DB_USER")}</li>
+                          <li><b>DB_PASSWORD:</b> {creds.get("DB_PASSWORD")}</li>
+                        </ul>
+                      </div>
+
+                      <div class="section">
+                        <h2>📋 Messages Table</h2>
+                        <table>
+                          <tr><th>ID</th><th>Content</th></tr>
+                          {table}
+                        </table>
+                      </div>
+
+                      <div class="section">
+                        <h2>🔧 手動コマンドメモ</h2>
+                        <ul>
+                          <li><b>ポートフォワーディング:</b> kubectl port-forward deployment/demo-app 8080:5000</li>
+                          <li><b>データ挿入:</b>  kubectl exec -it $(kubectl get pod -l app=postgres -o jsonpath="{.items[0].metadata.name}") -- psql -U vaultadmin -d demo -c "INSERT INTO messages (id, content) VALUES (999, 'Manual insert from kubectl');"</li>
+                        </ul>
+                      </div>
+
+
+                      </body>
+                      </html>
+                      """
+                  except Exception as e:
+                      return f"<h2>❌ Error:</h2><pre>{e}</pre>"
+
+              if __name__ == "__main__":
+                  app.run(host="0.0.0.0", port=5000)
+              EOF
+
+              python app.py
+          ports:
+            - containerPort: 5000

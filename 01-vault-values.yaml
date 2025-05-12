@@ -1,0 +1,16 @@
+server:
+  dev:
+    enabled: true
+  extraEnvironmentVars:
+    VAULT_DEV_ROOT_TOKEN_ID: "root"
+  dataStorage:
+    enabled: false
+  serviceAccount:
+    create: false
+    name: vault
+
+injector:
+  enabled: true
+  authPath: "auth/kubernetes"
+  defaultVaultRole: "myapp-role"
+  templates: {} 

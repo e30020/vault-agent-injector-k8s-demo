@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-init
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: psql
+          image: postgres:15
+          command: ["psql"]
+          args:
+            [
+              "-U", "vaultadmin",
+              "-d", "demo",
+              "-h", "postgres",
+              "-f", "/sql/init.sql"
+            ]
+          env:
+            - name: PGPASSWORD
+              value: password
+          volumeMounts:
+            - name: sql-volume
+              mountPath: /sql
+      volumes:
+        - name: sql-volume
+          configMap:
+            name: postgres-init-sql
