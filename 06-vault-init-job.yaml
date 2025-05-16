@@ -22,13 +22,16 @@ spec:
               set -e
               export VAULT_ADDR=http://vault.default.svc:8200
 
+              echo "🔐 Enable Kubernetes Auth Method"
               vault auth enable kubernetes || true
 
+              echo "🔐 Configure Kubernetes Auth"
               vault write auth/kubernetes/config \
                 token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
                 kubernetes_host="https://${KUBERNETES_PORT_443_TCP_ADDR}:443" \
                 kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
+              echo "🔐 Create Policy and Role for DB"
               echo 'path "database/creds/readonly-role" { capabilities = ["read"] }' > /tmp/myapp-policy.hcl
               vault policy write myapp-policy /tmp/myapp-policy.hcl
 
@@ -38,6 +41,7 @@ spec:
                 policies=myapp-policy \
                 ttl=1h
 
+              echo "🔐 Enable and configure DB Secrets Engine"
               vault secrets enable database || true
 
               vault write database/config/my-postgres-db \
@@ -52,6 +56,11 @@ spec:
                 default_ttl="5" \
                 max_ttl="30" \
                 creation_statements=@/tmp/sql/readonly-role.sql
+
+              echo "🔐 Enable and configure Transit Secrets Engine"
+              vault secrets enable -path=transit transit || true
+
+              vault write -f transit/keys/my-transit-key
       volumes:
         - name: sql-volume
           configMap:
