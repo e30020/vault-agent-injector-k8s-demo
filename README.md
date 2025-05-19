@@ -10,6 +10,14 @@ sudo apt-get install helm
 # 初期化処理（Vault、PostgreSQL、アプリのデプロイ）
 ./setup.sh
 
+
+minikube ssh
+docker pull nginx:1.25
+docker pull python:3.10-slim
+docker pull postgres:15
+
+
+
 # リソース一式のクリーンアップ
 ./cleanup.sh
 
