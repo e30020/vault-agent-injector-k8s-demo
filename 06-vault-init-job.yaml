@@ -14,54 +14,102 @@ spec:
             - name: VAULT_TOKEN
               value: "root"
           volumeMounts:
-            - name: sql-volume
-              mountPath: /tmp/sql
+            - name: init-sql-volume
+              mountPath: /tmp/sql/init
+            - name: readonly-role-volume
+              mountPath: /tmp/sql/readonly
           command: ["/bin/sh", "-c"]
           args:
             - |
               set -e
               export VAULT_ADDR=http://vault.default.svc:8200
 
-              echo "🔐 Enable Kubernetes Auth Method"
+              # Kubernetes Auth
               vault auth enable kubernetes || true
-
-              echo "🔐 Configure Kubernetes Auth"
               vault write auth/kubernetes/config \
                 token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
                 kubernetes_host="https://${KUBERNETES_PORT_443_TCP_ADDR}:443" \
                 kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-
-              echo "🔐 Create Policy and Role for DB"
               echo 'path "database/creds/readonly-role" { capabilities = ["read"] }' > /tmp/myapp-policy.hcl
               vault policy write myapp-policy /tmp/myapp-policy.hcl
-
               vault write auth/kubernetes/role/myapp-role \
                 bound_service_account_names=vault \
                 bound_service_account_namespaces=default \
                 policies=myapp-policy \
                 ttl=1h
+              echo 'path "pki-int/issue/nginx" { capabilities = ["update"] }' > /tmp/nginx-policy.hcl
+              vault policy write nginx-policy /tmp/nginx-policy.hcl
+              vault write auth/kubernetes/role/nginx-role \
+                bound_service_account_names=vault \
+                bound_service_account_namespaces=default \
+                policies=nginx-policy \
+                ttl=1h
 
-              echo "🔐 Enable and configure DB Secrets Engine"
+              # Database
               vault secrets enable database || true
-
               vault write database/config/my-postgres-db \
                 plugin_name=postgresql-database-plugin \
                 allowed_roles=readonly-role \
                 connection_url="postgresql://{{username}}:{{password}}@postgres:5432/demo?sslmode=disable" \
                 username="vaultadmin" \
                 password="password"
-
               vault write database/roles/readonly-role \
                 db_name=my-postgres-db \
                 default_ttl="5" \
                 max_ttl="30" \
-                creation_statements=@/tmp/sql/readonly-role.sql
+                creation_statements=@/tmp/sql/readonly/readonly-role.sql
 
-              echo "🔐 Enable and configure Transit Secrets Engine"
-              vault secrets enable -path=transit transit || true
+ 
+              # PKI: Root
+              echo "Enable Root PKI"
+              vault secrets enable -path=pki-root pki || true
+              vault write pki-root/root/generate/internal \
+                common_name="Root CA" \
+                ttl=87600h
 
-              vault write -f transit/keys/my-transit-key
+              # PKI: Intermediate
+              echo "Enable Intermediate PKI"
+              vault secrets enable -path=pki-int pki || true
+              vault write -format=json pki-int/intermediate/generate/internal \
+                common_name="nginx Intermediate CA" \
+                ttl=43800h > /tmp/intermediate-csr.json
+
+              CSR=$(cat /tmp/intermediate-csr.json | grep '"csr"' | cut -d '"' -f4)
+              printf "%b\n" "$CSR" > /tmp/intermediate.csr.pem
+
+              echo "Sign Intermediate CSR with Root"
+              vault write -format=json pki-root/root/sign-intermediate \
+                csr=@/tmp/intermediate.csr.pem \
+                format=pem ttl=43800h > /tmp/intermediate-cert.json
+
+              CERT=$(cat /tmp/intermediate-cert.json | grep '"certificate"' | cut -d '"' -f4)
+              printf "%b\n" "$CERT" > /tmp/intermediate.cert.pem
+
+              # 🔁 修正ポイント: Root証明書を取得してbundle作成
+              vault read -field=certificate pki-root/cert/ca > /tmp/root.cert.pem
+              cat /tmp/intermediate.cert.pem /tmp/root.cert.pem > /tmp/intermediate-bundle.cert.pem
+
+              echo "Set signed intermediate certificate"
+              vault write pki-int/intermediate/set-signed \
+                certificate=@/tmp/intermediate-bundle.cert.pem
+
+              echo "Set issuing/CRL URLs"
+              vault write pki-int/config/urls \
+                issuing_certificates="$VAULT_ADDR/v1/pki-int/ca" \
+                crl_distribution_points="$VAULT_ADDR/v1/pki-int/crl"
+
+              echo "Create Role"
+              vault write pki-int/roles/nginx \
+                allowed_domains="nginx.example.com" \
+                allow_subdomains=true \
+                allow_bare_domains=true \
+                max_ttl="72h"
+
+              echo "Vault PKI Init Complete"
       volumes:
-        - name: sql-volume
+        - name: init-sql-volume
+          configMap:
+            name: postgres-init-sql
+        - name: readonly-role-volume
           configMap:
             name: readonly-role-sql

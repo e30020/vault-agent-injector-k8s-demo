@@ -74,7 +74,14 @@ kubectl apply -f 06-vault-init-job.yaml || error_report "06-vault-init-job.yaml 
 kubectl apply -f 07-postgres-init-job.yaml || error_report "07-postgres-init-job.yaml の適用に失敗しました。"
 
 echo "📦 FlaskアプリのDeploymentを適用"
+kubectl apply -f 10-configmap-nginx-conf.yaml || error_report "10-configmap-nginx-conf.yaml の適用に失敗しました。"
 kubectl apply -f 04-demo-app-deployment.yaml || error_report "04-demo-app-deployment.yaml の適用に失敗しました。"
+
+echo "📦 Nginx リバースプロキシの Deployment を適用"
+kubectl apply -f 08-nginx-deployment.yaml || error_report "08-nginx-deployment.yaml の適用に失敗しました。"
+kubectl apply -f 09-nginx-service.yaml || error_report "09-nginx-service.yaml の適用に失敗しました。"
+
+
 
 echo "⏳ PostgreSQL Pod がReadyになるまで待機中..."
 kubectl wait --for=condition=Ready pod -l app=postgres --timeout=${CHECK_TIMEOUT}s \
@@ -84,5 +91,8 @@ echo "⏳ Flask アプリPod (label=app=demo-app) がReadyになるまで待機�
 kubectl wait --for=condition=Ready pod -l app=demo-app --timeout=${CHECK_TIMEOUT}s \
   || error_report "Flaskアプリ Pod (label=app=demo-app) がReadyになりません。"
 
-echo "🎉 セットアップ成功！Vault Agent Injector による注入と Flask アプリの起動が確認できました。"
+echo "⏳ nginx Pod が Ready になるまで待機中..."
+kubectl wait --for=condition=Ready pod -l app=nginx-tls --timeout=${CHECK_TIMEOUT}s \
+  || error_report "nginx Pod (label=app=nginx-tls) がReadyになりません。"
 
+echo "🎉 セットアップ成功！Vault Agent Injector による注入と Flask アプリの起動が確認できました。"

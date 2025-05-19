@@ -16,6 +16,8 @@ spec:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "myapp-role"
+
+        # 既存のDBクレデンシャル注入設定
         vault.hashicorp.com/agent-inject-secret-db-creds: "database/creds/readonly-role"
         vault.hashicorp.com/agent-inject-template-db-creds: |
           {{- with secret "database/creds/readonly-role" -}}
@@ -24,6 +26,21 @@ spec:
           {{- end }}
         vault.hashicorp.com/agent-pre-populate: "true"
         vault.hashicorp.com/agent-init-first: "true"
+
+#        # 追加：TLS証明書注入設定
+#        vault.hashicorp.com/agent-inject-secret-tls: "pki-int/issue/nginx"
+#        vault.hashicorp.com/agent-inject-template-tls.crt: |
+#          {{ with secret "pki-int/issue/nginx" "common_name=nginx.example.com" }}
+#          {{ .Data.certificate }}
+#          {{ .Data.issuing_ca }}
+#          {{ range .Data.ca_chain }}
+#          {{ . }}
+#          {{ end }}
+#          {{ end }}
+#        vault.hashicorp.com/agent-inject-template-tls.key: |
+#          {{ with secret "pki-int/issue/nginx" "common_name=nginx.example.com" }}
+#          {{ .Data.private_key }}
+#          {{ end }}
     spec:
       serviceAccountName: vault
       containers:
@@ -32,7 +49,7 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              pip install flask psycopg2-binary requests;
+              pip install flask psycopg2-binary requests pyOpenSSL;
 
               cat <<EOF > app.py
               from flask import Flask, request
@@ -184,7 +201,7 @@ spec:
                           <label>暗号文:</label><br>
                           <textarea name="decrypt_input">{decrypt_input}</textarea><br>
                           <button type="submit">🔓 復号化</button>
-                        </form>
+                        </form> 
                         {"<h4>復号結果:</h4><textarea readonly>" + plaintext + "</textarea>" if plaintext else ""}
                         {"<h4>curl:</h4><textarea readonly>" + decrypt_curl + "</textarea>" if decrypt_curl else ""}
                       </div>
@@ -200,3 +217,10 @@ spec:
               python app.py
           ports:
             - containerPort: 5000
+          volumeMounts:
+            - mountPath: /etc/tls
+              name: tls-certs
+              readOnly: true
+      volumes:
+        - name: tls-certs
+          emptyDir: {}
