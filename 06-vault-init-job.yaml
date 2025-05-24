@@ -59,6 +59,9 @@ spec:
                 max_ttl="30" \
                 creation_statements=@/tmp/sql/readonly/readonly-role.sql
 
+              # Transit
+              vault secrets enable -path=transit transit || true
+              vault write -f transit/keys/my-transit-key
  
               # PKI: Root
               echo "Enable Root PKI"
@@ -106,6 +109,7 @@ spec:
                 max_ttl="72h"
 
               echo "Vault PKI Init Complete"
+
       volumes:
         - name: init-sql-volume
           configMap:
