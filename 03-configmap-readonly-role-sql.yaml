@@ -6,7 +6,7 @@ metadata:
 data:
   readonly-role.sql: |
     CREATE ROLE "{{name}}" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
-    GRANT CONNECT ON DATABASE demo TO "{{name}}";
+    GRANT CONNECT ON DATABASE inventorydb TO "{{name}}";
     GRANT USAGE ON SCHEMA public TO "{{name}}";
     GRANT SELECT ON ALL TABLES IN SCHEMA public TO "{{name}}";
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO "{{name}}";

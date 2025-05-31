@@ -1,9 +1,10 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo-app
   labels:
     app: demo-app
+  name: demo-app
 spec:
   replicas: 1
   selector:
@@ -11,127 +12,104 @@ spec:
       app: demo-app
   template:
     metadata:
-      labels:
-        app: demo-app
       annotations:
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/role: "myapp-role"
-
-        # 既存のDBクレデンシャル注入設定
-        vault.hashicorp.com/agent-inject-secret-db-creds: "database/creds/readonly-role"
+        vault.hashicorp.com/agent-init-first: 'true'
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/agent-inject-secret-db-creds: database/creds/readonly-role
         vault.hashicorp.com/agent-inject-template-db-creds: |
           {{- with secret "database/creds/readonly-role" -}}
           DB_USER={{ .Data.username }}
           DB_PASSWORD={{ .Data.password }}
           {{- end }}
-        vault.hashicorp.com/agent-pre-populate: "true"
-        vault.hashicorp.com/agent-init-first: "true"
-
-#        # 追加：TLS証明書注入設定
-#        vault.hashicorp.com/agent-inject-secret-tls: "pki-int/issue/nginx"
-#        vault.hashicorp.com/agent-inject-template-tls.crt: |
-#          {{ with secret "pki-int/issue/nginx" "common_name=nginx.example.com" }}
-#          {{ .Data.certificate }}
-#          {{ .Data.issuing_ca }}
-#          {{ range .Data.ca_chain }}
-#          {{ . }}
-#          {{ end }}
-#          {{ end }}
-#        vault.hashicorp.com/agent-inject-template-tls.key: |
-#          {{ with secret "pki-int/issue/nginx" "common_name=nginx.example.com" }}
-#          {{ .Data.private_key }}
-#          {{ end }}
+        vault.hashicorp.com/agent-pre-populate: 'true'
+        vault.hashicorp.com/role: myapp-role
+      labels:
+        app: demo-app
     spec:
-      serviceAccountName: vault
       containers:
-        - name: app
-          image: python:3.10-slim
-          command: ["/bin/sh", "-c"]
-          args:
+        - args:
             - |
               pip install flask psycopg2-binary requests pyOpenSSL;
 
               cat <<EOF > app.py
-              from flask import Flask, request
+              from flask import Flask, request, render_template_string
               import psycopg2, os, time, datetime, requests
 
               app = Flask(__name__)
 
+              def load_env_file(path):
+                  creds = {}
+                  with open(path) as f:
+                      for line in f:
+                          if "=" in line:
+                              k, v = line.strip().split("=", 1)
+                              creds[k] = v
+                  return creds
+
               @app.route("/")
-              def show_messages():
+              def index():
+                  secret_path = "/vault/secrets/db-creds"
+                  if not os.path.exists(secret_path):
+                      return "<h2 style='color:red;'>Vaultのシークレットが見つかりません</h2>"
                   try:
-                      creds = {}
-                      secret_path = "/vault/secrets/db-creds"
-                      with open(secret_path, "r") as f:
-                          for line in f:
-                              if "=" in line:
-                                  key, value = line.strip().split("=", 1)
-                                  creds[key] = value
-
-                      updated_epoch = os.path.getmtime(secret_path)
-                      updated_str = datetime.datetime.fromtimestamp(updated_epoch).strftime('%Y-%m-%d %H:%M:%S')
-                      ttl_seconds = 30
-                      elapsed = int(time.time() - updated_epoch)
-                      remaining = max(ttl_seconds - elapsed, 0)
-
-                      conn = psycopg2.connect(
-                          dbname="demo",
-                          user=creds.get("DB_USER"),
-                          password=creds.get("DB_PASSWORD"),
-                          host="postgres",
-                          port=5432
-                      )
-                      cur = conn.cursor()
-                      cur.execute("SELECT * FROM messages;")
-                      rows = cur.fetchall()
-                      cur.close()
-                      conn.close()
-
-                      table = "".join(f"<tr><td>{r[0]}</td><td>{r[1]}</td></tr>" for r in rows)
-
-                      return f"""
-                      <html><head><meta http-equiv="refresh" content="3">
-                      <style>body {{ font-family: Arial; }}</style></head><body>
-                      <a href='/transit'>🔁 Transit デモへ</a>
-                      <div class="section">
-                        <h2>🔧 Vault Agent Injector の裏側の動作</h2>
-                        <ul>
-                          <li>✅ <strong>アプリケーション Pod の起動時</strong>、<strong>Vault Agent</strong> が Sidecar コンテナとして自動的に起動</li>
-                          <li>✅ Kubernetes の標準機能で自動マウントされた <code>/var/run/secrets/kubernetes.io/serviceaccount/token</code> の JWT を使用し、<strong>Vault Agent</strong> が Vault の Kubernetes Auth Method にログイン</li>
-                          <li>✅ <strong>Vault Agent がログイン後に取得した Vault Token</strong> は、メモリ上に安全に保持（ファイルには保存されない構成）</li>
-                          <li>✅ <strong>Vault Agent が</strong>、Vault Token を使って <code>database/creds/readonly-role</code> から動的な DB 認証情報（Secret）を取得</li>
-                          <li>✅ <strong>アプリケーション Pod 内の Vault Agent Sidecar コンテナが</strong> テンプレートエンジンで Secret を整形し、<strong>共有ボリューム上の <code>/vault/secrets/db-creds</code></strong> にファイル出力</li>
-                          <li>🔁 <strong>Secret の TTL が切れると、Vault Agent が自動的に再取得・ファイル再生成</strong>（アプリケーションは再起動不要）</li>
-                        </ul>
-                      </div>
-
-                      <div class="section">
-                        <h2>📂 Secret ファイルの状態</h2>
-                        <ul>
-                          <li><b>ファイルパス:</b> /vault/secrets/db-creds</li>
-                          <li><b>最終更新日時:</b> {updated_str}</li>
-                          <li><b>TTL 残り秒数:</b> {remaining} 秒</li>
-                          <li><b>DB_USER:</b> {creds.get("DB_USER")}</li>
-                          <li><b>DB_PASSWORD:</b> {creds.get("DB_PASSWORD")}</li>
-                        </ul>
-                      </div>
-
-                      <div class="section">
-                        <h2>📋 Messages Table</h2>
-                        <table border="1"><tr><th>ID</th><th>Content</th></tr>{table}</table>
-                      </div>
-
-                      <div class="section">
-                        <h2>🔧 手動コマンドメモ</h2>
-                        <ul>
-                          <li><b>ポートフォワーディング:</b> kubectl port-forward deployment/demo-app 8080:5000</li>
-                          <li><b>データ挿入:</b> 'kubectl exec -it $(kubectl get pod -l app=postgres -o jsonpath="{{{{.items[0].metadata.name}}}}") -- psql -U vaultadmin -d demo -c "INSERT INTO messages (id, content) VALUES (999, 'Manual insert');"'</li>
-                        </ul>
-                      </div>
-                      </body></html>
-                      """
+                      creds = load_env_file(secret_path)
                   except Exception as e:
-                      return f"<h2>❌ Error:</h2><pre>{e}</pre>"
+                      return f"<h2 style='color:red;'>シークレット読み込みエラー: {e}</h2>"
+
+                  try:
+                      connection = psycopg2.connect(
+                          host="postgres",
+                          dbname="inventorydb",
+                          user=creds["DB_USER"],
+                          password=creds["DB_PASSWORD"]
+                      )
+                      cursor = connection.cursor()
+                      cursor.execute("SELECT name, stock, updated_at FROM inventory")
+                      items = [{"name": r[0], "stock": r[1], "updated_at": r[2]} for r in cursor.fetchall()]
+                      cursor.close()
+                      connection.close()
+                  except Exception as db_err:
+                      return f"<h2 style='color:red;'>DB接続エラー: {db_err}</h2>"
+
+                  html_template = '''
+                  <!DOCTYPE html>
+                  <html lang="ja">
+                  <head>
+                      <meta charset="UTF-8">
+                      <title>在庫管理システム</title>
+                      <style>
+                          body { font-family: sans-serif; margin: 40px; background-color: #f9f9f9; }
+                          h1 { color: #333; }
+                          table { width: 80%; border-collapse: collapse; margin-top: 20px; }
+                          th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
+                          th { background-color: #f0f0f0; }
+                          tr:nth-child(even) { background-color: #fdfdfd; }
+                      </style>
+                  </head>
+                  <body>
+                      <h1>在庫管理ダッシュボード</h1>
+                      <table>
+                          <thead>
+                              <tr>
+                                  <th>商品名</th>
+                                  <th>在庫数</th>
+                                  <th>最終更新日</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for item in items %}
+                              <tr>
+                                  <td>{{ item['name'] }}</td>
+                                  <td>{{ item['stock'] }}</td>
+                                  <td>{{ item['updated_at'] }}</td>
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table> 
+                  </body>
+                  </html>
+                  '''
+                  return render_template_string(html_template, items=items)
 
               @app.route("/transit", methods=["GET", "POST"])
               def transit_demo():
@@ -170,42 +148,23 @@ spec:
 
                   return f"""
                   <html>
-                  <head>
-                    <style>
-                      body {{ font-family: Arial; }}
-                      .container {{ display: flex; gap: 40px; }}
-                      .box {{ flex: 1; border: 1px solid #ccc; padding: 20px; }}
-                      input, textarea {{ width: 100%; margin-top: 8px; }}
-                      textarea {{ height: 100px; }}
-                    </style>
-                  </head>
                   <body>
                     <h2>🔐 Vault Transit Engine Demo</h2>
                     <a href="/">⬅ DB Secret デモへ戻る</a>
-                    <div class="container">
-                      <div class="box">
-                        <h3>📝 暗号化</h3>
-                        <form method="post">
-                          <input type="hidden" name="mode" value="encrypt" />
-                          <label>平文:</label><br>
-                          <input name="encrypt_input" value="{encrypt_input}" /><br><br>
-                          <button type="submit">🔒 暗号化</button>
-                        </form>
-                        {"<h4>暗号化結果:</h4><textarea readonly>" + ciphertext + "</textarea>" if ciphertext else ""}
-                        {"<h4>curl:</h4><textarea readonly>" + encrypt_curl + "</textarea>" if encrypt_curl else ""}
-                      </div>
-                      <div class="box">
-                        <h3>🔓 復号化</h3>
-                        <form method="post">
-                          <input type="hidden" name="mode" value="decrypt" />
-                          <label>暗号文:</label><br>
-                          <textarea name="decrypt_input">{decrypt_input}</textarea><br>
-                          <button type="submit">🔓 復号化</button>
-                        </form> 
-                        {"<h4>復号結果:</h4><textarea readonly>" + plaintext + "</textarea>" if plaintext else ""}
-                        {"<h4>curl:</h4><textarea readonly>" + decrypt_curl + "</textarea>" if decrypt_curl else ""}
-                      </div>
-                    </div>
+                    <form method="post">
+                      <input type="hidden" name="mode" value="encrypt" />
+                      <label>平文:</label><br>
+                      <input name="encrypt_input" value="{encrypt_input}" /><br><br>
+                      <button type="submit">🔒 暗号化</button>
+                    </form>
+                    <pre>{ciphertext}</pre>
+                    <form method="post">
+                      <input type="hidden" name="mode" value="decrypt" />
+                      <label>暗号文:</label><br>
+                      <textarea name="decrypt_input">{decrypt_input}</textarea><br>
+                      <button type="submit">🔓 復号化</button>
+                    </form>
+                    <pre>{plaintext}</pre>
                   </body>
                   </html>
                   """
@@ -215,12 +174,16 @@ spec:
               EOF
 
               python app.py
+          command: ["/bin/sh", "-c"]
+          image: python:3.11-slim
+          name: app
           ports:
             - containerPort: 5000
           volumeMounts:
             - mountPath: /etc/tls
               name: tls-certs
               readOnly: true
+      serviceAccountName: vault
       volumes:
-        - name: tls-certs
-          emptyDir: {}
+        - emptyDir: {}
+          name: tls-certs

@@ -1,4 +1,5 @@
 #!/bin/bash
+pkill -f port-forward
 
 # Vault Pod名を取得
 VAULT_POD=$(kubectl get pod -l app.kubernetes.io/name=vault -o jsonpath="{.items[0].metadata.name}")

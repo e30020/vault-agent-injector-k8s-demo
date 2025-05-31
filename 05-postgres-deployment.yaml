@@ -21,7 +21,7 @@ spec:
             - containerPort: 5432
           env:
             - name: POSTGRES_DB
-              value: demo
+              value: inventorydb
             - name: POSTGRES_USER
               value: vaultadmin
             - name: POSTGRES_PASSWORD

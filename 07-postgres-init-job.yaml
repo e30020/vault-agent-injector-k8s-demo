@@ -13,7 +13,7 @@ spec:
           args:
             [
               "-U", "vaultadmin",
-              "-d", "demo",
+              "-d", "inventorydb",
               "-h", "postgres",
               "-f", "/sql/init.sql"
             ]

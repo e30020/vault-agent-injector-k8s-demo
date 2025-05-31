@@ -50,7 +50,7 @@ spec:
               vault write database/config/my-postgres-db \
                 plugin_name=postgresql-database-plugin \
                 allowed_roles=readonly-role \
-                connection_url="postgresql://{{username}}:{{password}}@postgres:5432/demo?sslmode=disable" \
+                connection_url="postgresql://{{username}}:{{password}}@postgres:5432/inventorydb?sslmode=disable" \
                 username="vaultadmin" \
                 password="password"
               vault write database/roles/readonly-role \

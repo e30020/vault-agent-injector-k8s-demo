@@ -1,0 +1,2178 @@
+======= [Vault Helm Release Status] =======
+NAME 	NAMESPACE	REVISION	UPDATED                                	STATUS  	CHART       	APP VERSION
+vault	default  	1       	2025-05-31 08:54:13.823302329 +0900 JST	deployed	vault-0.30.0	1.19.0     
+======= [Vault Pods] =======
+NAME                                    READY   STATUS      RESTARTS       AGE    IP            NODE       NOMINATED NODE   READINESS GATES
+demo-app-64dc955864-6bw7s               0/2     Init:0/1    0              117s   10.244.3.28   minikube   <none>           <none>
+nginx-tls-5b74c74f46-dq4rm              2/2     Running     2 (107s ago)   116s   10.244.3.29   minikube   <none>           <none>
+postgres-b85d56587-lbhnh                1/1     Running     0              118s   10.244.3.25   minikube   <none>           <none>
+postgres-init-t2828                     0/1     Completed   2              118s   10.244.3.27   minikube   <none>           <none>
+vault-0                                 1/1     Running     0              2m7s   10.244.3.24   minikube   <none>           <none>
+vault-agent-injector-75f9dfc9c8-4jthz   1/1     Running     0              2m7s   10.244.3.23   minikube   <none>           <none>
+vault-init-jjcl5                        0/1     Completed   1              118s   10.244.3.26   minikube   <none>           <none>
+======= [Vault Injector Logs] =======
+2025-05-30T23:54:15.264Z [INFO]  handler.auto-tls: Generated CA
+2025-05-30T23:54:15.268Z [INFO]  handler: Starting handler..
+Listening on ":8080"...
+2025-05-30T23:54:15.363Z [INFO]  handler.certwatcher: Updated certificate bundle received. Updating certs...
+2025-05-30T23:54:23.544Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
+2025-05-30T23:54:23.719Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
+2025-05-30T23:54:23.895Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
+2025-05-30T23:54:24.390Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
+2025-05-30T23:54:25.160Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
+======= [Vault Init Job Logs] =======
+Error enabling kubernetes auth: Error making API request.
+
+URL: POST http://vault.default.svc:8200/v1/sys/auth/kubernetes
+Code: 400. Errors:
+
+* path is already in use at kubernetes/
+Success! Data written to: auth/kubernetes/config
+Success! Uploaded policy: myapp-policy
+Success! Data written to: auth/kubernetes/role/myapp-role
+Success! Uploaded policy: nginx-policy
+Success! Data written to: auth/kubernetes/role/nginx-role
+Error enabling: Error making API request.
+
+URL: POST http://vault.default.svc:8200/v1/sys/mounts/database
+Code: 400. Errors:
+
+* path is already in use at database/
+Success! Data written to: database/config/my-postgres-db
+Success! Data written to: database/roles/readonly-role
+Success! Enabled the transit secrets engine at: transit/
+Key                       Value
+---                       -----
+allow_plaintext_backup    false
+auto_rotate_period        0s
+deletion_allowed          false
+derived                   false
+exportable                false
+imported_key              false
+keys                      map[1:1748649276]
+latest_version            1
+min_available_version     0
+min_decryption_version    1
+min_encryption_version    0
+name                      my-transit-key
+supports_decryption       true
+supports_derivation       true
+supports_encryption       true
+supports_signing          false
+type                      aes256-gcm96
+Enable Root PKI
+Success! Enabled the pki secrets engine at: pki-root/
+WARNING! The following warnings were returned from Vault:
+
+  * This mount hasn't configured any authority information access (AIA)
+  fields; this may make it harder for systems to find missing certificates
+  in the chain or to validate revocation status of certificates. Consider
+  updating /config/urls or the newly generated issuer with this information.
+
+Key              Value
+---              -----
+certificate      -----BEGIN CERTIFICATE-----
+MIIDFTCCAf2gAwIBAgIUJYWfxiMl4u+gWT7KLdfGfY2J+WEwDQYJKoZIhvcNAQEL
+BQAwEjEQMA4GA1UEAxMHUm9vdCBDQTAeFw0yNTA1MzAyMzU0MDdaFw0yNTA3MDEy
+MzU0MzZaMBIxEDAOBgNVBAMTB1Jvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IB
+DwAwggEKAoIBAQCcDub03IBtn3q1cQiq+3iOAR2s0HZUmFEGR+a8kVOd/5TkWaCg
+g0V1va8mqdZ77EGvRT39RU+qJj7gJpzNubCp9HcMoIiPXtqBaUk++mr1mE/Akxk8
+7DH8o7JBicHEvqWMURt4csey2W7dxBXO2w1Ki1dfhVV17mjd1xwEWqLZOgtZu5Gh
+BVZl8Pw6e0JJMCy4FNh3VFkYrmfPJL7XojT/AkQFGSeBjPvReLS3Va1tvTougaoC
+nAK3VQHtsQfc2+cRiNdDW4DJyVcyuuxqGrMOaIX51Zc/T0zctIDjUt9ycUfsK7I9
+RlSlNj1FjqBaIIqskHVcnUOBCsvEuCTXjjvjAgMBAAGjYzBhMA4GA1UdDwEB/wQE
+AwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQvkvGmD6bAICbMXUS0DdKq
+/+78+jAfBgNVHSMEGDAWgBQvkvGmD6bAICbMXUS0DdKq/+78+jANBgkqhkiG9w0B
+AQsFAAOCAQEAfkMJSCFPc3OKXM8Xr977wzBgqI4JAKojTTxV0gXSbNTqzWi0EaqP
+Q958GXi0AuGVPX/V+MQ8QVrnkBI3YDAkpe0hzD7Yv/iYy0Kr4bM4LQ9Rf+U8LBLI
+Ee4LPwlygdfMCSdHXFmoxB9tYhdalD15D7QTslTbWq7bIkqwpMepvIByaxe1dnTW
+YLLoEbNxrGv4DRr7SNT8fVwJ3uje8Yb1GxwmJ7wm85NafcjWyuAJoGLiyEbZp1hV
+UqANCah4qFBLn+GN7wL0zLUfJa7K/cDQquDjb2ayKpmhvPGjhwQzobV3J82qcfu1
+o20Z7dRzy8w4bGqTP6pQMIpwB7UMvKQ/qw==
+-----END CERTIFICATE-----
+expiration       1751414076
+issuer_id        f32d4f31-526c-aafc-834e-9342bf45b783
+issuer_name      n/a
+issuing_ca       -----BEGIN CERTIFICATE-----
+MIIDFTCCAf2gAwIBAgIUJYWfxiMl4u+gWT7KLdfGfY2J+WEwDQYJKoZIhvcNAQEL
+BQAwEjEQMA4GA1UEAxMHUm9vdCBDQTAeFw0yNTA1MzAyMzU0MDdaFw0yNTA3MDEy
+MzU0MzZaMBIxEDAOBgNVBAMTB1Jvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IB
+DwAwggEKAoIBAQCcDub03IBtn3q1cQiq+3iOAR2s0HZUmFEGR+a8kVOd/5TkWaCg
+g0V1va8mqdZ77EGvRT39RU+qJj7gJpzNubCp9HcMoIiPXtqBaUk++mr1mE/Akxk8
+7DH8o7JBicHEvqWMURt4csey2W7dxBXO2w1Ki1dfhVV17mjd1xwEWqLZOgtZu5Gh
+BVZl8Pw6e0JJMCy4FNh3VFkYrmfPJL7XojT/AkQFGSeBjPvReLS3Va1tvTougaoC
+nAK3VQHtsQfc2+cRiNdDW4DJyVcyuuxqGrMOaIX51Zc/T0zctIDjUt9ycUfsK7I9
+RlSlNj1FjqBaIIqskHVcnUOBCsvEuCTXjjvjAgMBAAGjYzBhMA4GA1UdDwEB/wQE
+AwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQvkvGmD6bAICbMXUS0DdKq
+/+78+jAfBgNVHSMEGDAWgBQvkvGmD6bAICbMXUS0DdKq/+78+jANBgkqhkiG9w0B
+AQsFAAOCAQEAfkMJSCFPc3OKXM8Xr977wzBgqI4JAKojTTxV0gXSbNTqzWi0EaqP
+Q958GXi0AuGVPX/V+MQ8QVrnkBI3YDAkpe0hzD7Yv/iYy0Kr4bM4LQ9Rf+U8LBLI
+Ee4LPwlygdfMCSdHXFmoxB9tYhdalD15D7QTslTbWq7bIkqwpMepvIByaxe1dnTW
+YLLoEbNxrGv4DRr7SNT8fVwJ3uje8Yb1GxwmJ7wm85NafcjWyuAJoGLiyEbZp1hV
+UqANCah4qFBLn+GN7wL0zLUfJa7K/cDQquDjb2ayKpmhvPGjhwQzobV3J82qcfu1
+o20Z7dRzy8w4bGqTP6pQMIpwB7UMvKQ/qw==
+-----END CERTIFICATE-----
+key_id           052bec32-b0a1-5e12-a06e-c21ba1c0e1fa
+key_name         n/a
+serial_number    25:85:9f:c6:23:25:e2:ef:a0:59:3e:ca:2d:d7:c6:7d:8d:89:f9:61
+Enable Intermediate PKI
+Success! Enabled the pki secrets engine at: pki-int/
+Sign Intermediate CSR with Root
+Set signed intermediate certificate
+Key                 Value
+---                 -----
+existing_issuers    <nil>
+existing_keys       <nil>
+imported_issuers    [bcdf449d-33dd-04df-ad5e-2944b646a7d1 4c93ed92-e259-ed24-77be-426844042759]
+imported_keys       <nil>
+mapping             map[4c93ed92-e259-ed24-77be-426844042759: bcdf449d-33dd-04df-ad5e-2944b646a7d1:1dccac95-9039-6039-66fe-4084c8a11c5d]
+WARNING! The following warnings were returned from Vault:
+
+  * This mount hasn't configured any authority information access (AIA)
+  fields; this may make it harder for systems to find missing certificates
+  in the chain or to validate revocation status of certificates. Consider
+  updating /config/urls or the newly generated issuer with this information.
+
+Set issuing/CRL URLs
+Key                        Value
+---                        -----
+crl_distribution_points    [http://vault.default.svc:8200/v1/pki-int/crl]
+enable_templating          false
+issuing_certificates       [http://vault.default.svc:8200/v1/pki-int/ca]
+ocsp_servers               []
+Create Role
+Key                                   Value
+---                                   -----
+allow_any_name                        false
+allow_bare_domains                    true
+allow_glob_domains                    false
+allow_ip_sans                         true
+allow_localhost                       true
+allow_subdomains                      true
+allow_token_displayname               false
+allow_wildcard_certificates           true
+allowed_domains                       [nginx.example.com]
+allowed_domains_template              false
+allowed_other_sans                    []
+allowed_serial_numbers                []
+allowed_uri_sans                      []
+allowed_uri_sans_template             false
+allowed_user_ids                      []
+basic_constraints_valid_for_non_ca    false
+client_flag                           true
+cn_validations                        [email hostname]
+code_signing_flag                     false
+country                               []
+email_protection_flag                 false
+enforce_hostnames                     true
+ext_key_usage                         []
+ext_key_usage_oids                    []
+generate_lease                        false
+issuer_ref                            default
+key_bits                              2048
+key_type                              rsa
+key_usage                             [DigitalSignature KeyAgreement KeyEncipherment]
+locality                              []
+max_ttl                               72h
+no_store                              false
+not_after                             n/a
+not_before_duration                   30s
+organization                          []
+ou                                    []
+policy_identifiers                    []
+postal_code                           []
+province                              []
+require_cn                            true
+serial_number_source                  json-csr
+server_flag                           true
+signature_bits                        256
+street_address                        []
+ttl                                   0s
+use_csr_common_name                   true
+use_csr_sans                          true
+use_pss                               false
+Vault PKI Init Complete
+======= [App Logs] =======
+Error from server (BadRequest): container "app" in pod "demo-app-64dc955864-6bw7s" is waiting to start: PodInitializing
+app logs failed
+======= [Describe All Resources] =======
+Name:             demo-app-64dc955864-6bw7s
+Namespace:        default
+Priority:         0
+Service Account:  vault
+Node:             minikube/192.168.49.2
+Start Time:       Sat, 31 May 2025 08:54:24 +0900
+Labels:           app=demo-app
+                  pod-template-hash=64dc955864
+Annotations:      vault.hashicorp.com/agent-init-first: true
+                  vault.hashicorp.com/agent-inject: true
+                  vault.hashicorp.com/agent-inject-secret-db-creds: database/creds/readonly-role
+                  vault.hashicorp.com/agent-inject-status: injected
+                  vault.hashicorp.com/agent-inject-template-db-creds:
+                    {{- with secret "database/creds/readonly-role" -}}
+                    DB_USER={{ .Data.username }}
+                    DB_PASSWORD={{ .Data.password }}
+                    {{- end }}
+                  vault.hashicorp.com/agent-pre-populate: true
+                  vault.hashicorp.com/role: myapp-role
+Status:           Pending
+IP:               10.244.3.28
+IPs:
+  IP:           10.244.3.28
+Controlled By:  ReplicaSet/demo-app-64dc955864
+Init Containers:
+  vault-agent-init:
+    Container ID:  docker://911dfc080fd420447356e294f5347f37a8cd88e4bdd0c1d6831794c0cc3401f3
+    Image:         hashicorp/vault:1.19.0
+    Image ID:      docker-pullable://hashicorp/vault@sha256:bbb7f98dc67d9ebdda1256de288df1cb9a5450990e48338043690bee3b332c90
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/sh
+      -ec
+    Args:
+      echo ${VAULT_CONFIG?} | base64 -d > /home/vault/config.json && vault agent -config=/home/vault/config.json
+    State:          Running
+      Started:      Sat, 31 May 2025 08:54:30 +0900
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     500m
+      memory:  128Mi
+    Requests:
+      cpu:     250m
+      memory:  64Mi
+    Environment:
+      NAMESPACE:         default (v1:metadata.namespace)
+      HOST_IP:            (v1:status.hostIP)
+      POD_IP:             (v1:status.podIP)
+      VAULT_LOG_LEVEL:   info
+      VAULT_LOG_FORMAT:  standard
+      VAULT_CONFIG:      eyJhdXRvX2F1dGgiOnsibWV0aG9kIjp7InR5cGUiOiJrdWJlcm5ldGVzIiwibW91bnRfcGF0aCI6ImF1dGgva3ViZXJuZXRlcyIsImNvbmZpZyI6eyJyb2xlIjoibXlhcHAtcm9sZSIsInRva2VuX3BhdGgiOiIvdmFyL3J1bi9zZWNyZXRzL2t1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvdG9rZW4ifX0sInNpbmsiOlt7InR5cGUiOiJmaWxlIiwiY29uZmlnIjp7InBhdGgiOiIvaG9tZS92YXVsdC8udmF1bHQtdG9rZW4ifX1dfSwiZXhpdF9hZnRlcl9hdXRoIjp0cnVlLCJwaWRfZmlsZSI6Ii9ob21lL3ZhdWx0Ly5waWQiLCJ2YXVsdCI6eyJhZGRyZXNzIjoiaHR0cDovL3ZhdWx0LmRlZmF1bHQuc3ZjOjgyMDAifSwidGVtcGxhdGUiOlt7ImRlc3RpbmF0aW9uIjoiL3ZhdWx0L3NlY3JldHMvZGItY3JlZHMiLCJjb250ZW50cyI6Int7LSB3aXRoIHNlY3JldCBcImRhdGFiYXNlL2NyZWRzL3JlYWRvbmx5LXJvbGVcIiAtfX1cbkRCX1VTRVI9e3sgLkRhdGEudXNlcm5hbWUgfX1cbkRCX1BBU1NXT1JEPXt7IC5EYXRhLnBhc3N3b3JkIH19XG57ey0gZW5kIH19XG4iLCJsZWZ0X2RlbGltaXRlciI6Int7IiwicmlnaHRfZGVsaW1pdGVyIjoifX0ifV0sInRlbXBsYXRlX2NvbmZpZyI6eyJleGl0X29uX3JldHJ5X2ZhaWx1cmUiOnRydWV9fQ==
+    Mounts:
+      /home/vault from home-init (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-l7hqq (ro)
+      /vault/secrets from vault-secrets (rw)
+Containers:
+  app:
+    Container ID:  
+    Image:         python:3.11-slim
+    Image ID:      
+    Port:          5000/TCP
+    Host Port:     0/TCP
+    Command:
+      /bin/sh
+      -c
+    Args:
+      pip install flask psycopg2-binary requests pyOpenSSL;
+      
+      cat <<EOF > app.py
+      from flask import Flask, request, render_template_string
+      import psycopg2, os, time, datetime, requests
+      
+      app = Flask(__name__)
+      
+      def load_env_file(path):
+          creds = {}
+          with open(path) as f:
+              for line in f:
+                  if "=" in line:
+                      k, v = line.strip().split("=", 1)
+                      creds[k] = v
+          return creds
+      
+      @app.route("/")
+      def index():
+          secret_path = "/vault/secrets/db-creds"
+          if not os.path.exists(secret_path):
+              return "<h2 style='color:red;'>Vaultのシークレットが見つかりません</h2>"
+          try:
+              creds = load_env_file(secret_path)
+          except Exception as e:
+              return f"<h2 style='color:red;'>シークレット読み込みエラー: {e}</h2>"
+      
+          try:
+              connection = psycopg2.connect(
+                  host="postgres",
+                  dbname="inventorydb",
+                  user=creds["DB_USER"],
+                  password=creds["DB_PASSWORD"]
+              )
+              cursor = connection.cursor()
+              cursor.execute("SELECT name, stock, updated_at FROM inventory")
+              items = [{"name": r[0], "stock": r[1], "updated_at": r[2]} for r in cursor.fetchall()]
+              cursor.close()
+              connection.close()
+          except Exception as db_err:
+              return f"<h2 style='color:red;'>DB接続エラー: {db_err}</h2>"
+      
+          html_template = '''
+          <!DOCTYPE html>
+          <html lang="ja">
+          <head>
+              <meta charset="UTF-8">
+              <title>在庫管理システム</title>
+              <style>
+                  body { font-family: sans-serif; margin: 40px; background-color: #f9f9f9; }
+                  h1 { color: #333; }
+                  table { width: 80%; border-collapse: collapse; margin-top: 20px; }
+                  th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
+                  th { background-color: #f0f0f0; }
+                  tr:nth-child(even) { background-color: #fdfdfd; }
+              </style>
+          </head>
+          <body>
+              <h1>在庫管理ダッシュボード</h1>
+              <table>
+                  <thead>
+                      <tr>
+                          <th>商品名</th>
+                          <th>在庫数</th>
+                          <th>最終更新日</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for item in items %}
+                      <tr>
+                          <td>{{ item['name'] }}</td>
+                          <td>{{ item['stock'] }}</td>
+                          <td>{{ item['updated_at'] }}</td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </body>
+          </html>
+          '''
+          return render_template_string(html_template, items=items)
+      
+      @app.route("/transit", methods=["GET", "POST"])
+      def transit_demo():
+          VAULT_ADDR = "http://vault:8200"
+          VAULT_TOKEN = "root"
+          KEY_NAME = "my-transit-key"
+      
+          encrypt_input = decrypt_input = ""
+          ciphertext = plaintext = ""
+          encrypt_curl = decrypt_curl = ""
+      
+          if request.method == "POST":
+              mode = request.form.get("mode")
+      
+              if mode == "encrypt":
+                  encrypt_input = request.form["encrypt_input"]
+                  b64 = encrypt_input.encode("utf-8").hex()
+                  res = requests.post(
+                      f"{VAULT_ADDR}/v1/transit/encrypt/{KEY_NAME}",
+                      headers={"X-Vault-Token": VAULT_TOKEN},
+                      json={"plaintext": b64}
+                  ).json()
+                  ciphertext = res["data"]["ciphertext"]
+                  encrypt_curl = f"curl -s -H 'X-Vault-Token: {VAULT_TOKEN}' -d '{{\"plaintext\":\"{b64}\"}}' {VAULT_ADDR}/v1/transit/encrypt/{KEY_NAME}"
+      
+              elif mode == "decrypt":
+                  decrypt_input = request.form["decrypt_input"]
+                  res = requests.post(
+                      f"{VAULT_ADDR}/v1/transit/decrypt/{KEY_NAME}",
+                      headers={"X-Vault-Token": VAULT_TOKEN},
+                      json={"ciphertext": decrypt_input}
+                  ).json()
+                  dec = res["data"]["plaintext"]
+                  plaintext = bytes.fromhex(dec).decode("utf-8")
+                  decrypt_curl = f"curl -s -H 'X-Vault-Token: {VAULT_TOKEN}' -d '{{\"ciphertext\":\"{decrypt_input}\"}}' {VAULT_ADDR}/v1/transit/decrypt/{KEY_NAME}"
+      
+          return f"""
+          <html>
+          <body>
+            <h2>🔐 Vault Transit Engine Demo</h2>
+            <a href="/">⬅ DB Secret デモへ戻る</a>
+            <form method="post">
+              <input type="hidden" name="mode" value="encrypt" />
+              <label>平文:</label><br>
+              <input name="encrypt_input" value="{encrypt_input}" /><br><br>
+              <button type="submit">🔒 暗号化</button>
+            </form>
+            <pre>{ciphertext}</pre>
+            <form method="post">
+              <input type="hidden" name="mode" value="decrypt" />
+              <label>暗号文:</label><br>
+              <textarea name="decrypt_input">{decrypt_input}</textarea><br>
+              <button type="submit">🔓 復号化</button>
+            </form>
+            <pre>{plaintext}</pre>
+          </body>
+          </html>
+          """
+      
+      if __name__ == "__main__":
+          app.run(host="0.0.0.0", port=5000)
+      EOF
+      
+      python app.py
+      
+    State:          Waiting
+      Reason:       PodInitializing
+    Ready:          False
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /etc/tls from tls-certs (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-l7hqq (ro)
+      /vault/secrets from vault-secrets (rw)
+  vault-agent:
+    Container ID:  
+    Image:         hashicorp/vault:1.19.0
+    Image ID:      
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/sh
+      -ec
+    Args:
+      echo ${VAULT_CONFIG?} | base64 -d > /home/vault/config.json && vault agent -config=/home/vault/config.json
+    State:          Waiting
+      Reason:       PodInitializing
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     500m
+      memory:  128Mi
+    Requests:
+      cpu:     250m
+      memory:  64Mi
+    Environment:
+      NAMESPACE:         default (v1:metadata.namespace)
+      HOST_IP:            (v1:status.hostIP)
+      POD_IP:             (v1:status.podIP)
+      VAULT_LOG_LEVEL:   info
+      VAULT_LOG_FORMAT:  standard
+      VAULT_CONFIG:      eyJhdXRvX2F1dGgiOnsibWV0aG9kIjp7InR5cGUiOiJrdWJlcm5ldGVzIiwibW91bnRfcGF0aCI6ImF1dGgva3ViZXJuZXRlcyIsImNvbmZpZyI6eyJyb2xlIjoibXlhcHAtcm9sZSIsInRva2VuX3BhdGgiOiIvdmFyL3J1bi9zZWNyZXRzL2t1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvdG9rZW4ifX0sInNpbmsiOlt7InR5cGUiOiJmaWxlIiwiY29uZmlnIjp7InBhdGgiOiIvaG9tZS92YXVsdC8udmF1bHQtdG9rZW4ifX1dfSwiZXhpdF9hZnRlcl9hdXRoIjpmYWxzZSwicGlkX2ZpbGUiOiIvaG9tZS92YXVsdC8ucGlkIiwidmF1bHQiOnsiYWRkcmVzcyI6Imh0dHA6Ly92YXVsdC5kZWZhdWx0LnN2Yzo4MjAwIn0sInRlbXBsYXRlIjpbeyJkZXN0aW5hdGlvbiI6Ii92YXVsdC9zZWNyZXRzL2RiLWNyZWRzIiwiY29udGVudHMiOiJ7ey0gd2l0aCBzZWNyZXQgXCJkYXRhYmFzZS9jcmVkcy9yZWFkb25seS1yb2xlXCIgLX19XG5EQl9VU0VSPXt7IC5EYXRhLnVzZXJuYW1lIH19XG5EQl9QQVNTV09SRD17eyAuRGF0YS5wYXNzd29yZCB9fVxue3stIGVuZCB9fVxuIiwibGVmdF9kZWxpbWl0ZXIiOiJ7eyIsInJpZ2h0X2RlbGltaXRlciI6In19In1dLCJ0ZW1wbGF0ZV9jb25maWciOnsiZXhpdF9vbl9yZXRyeV9mYWlsdXJlIjp0cnVlfX0=
+    Mounts:
+      /home/vault from home-sidecar (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-l7hqq (ro)
+      /vault/secrets from vault-secrets (rw)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 False 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  tls-certs:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  kube-api-access-l7hqq:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+  home-init:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     Memory
+    SizeLimit:  <unset>
+  home-sidecar:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     Memory
+    SizeLimit:  <unset>
+  vault-secrets:
+    Type:        EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:      Memory
+    SizeLimit:   <unset>
+QoS Class:       Burstable
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                 node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  117s  default-scheduler  Successfully assigned default/demo-app-64dc955864-6bw7s to minikube
+  Normal  Pulled     113s  kubelet            Container image "hashicorp/vault:1.19.0" already present on machine
+  Normal  Created    112s  kubelet            Created container: vault-agent-init
+  Normal  Started    111s  kubelet            Started container vault-agent-init
+
+
+Name:             nginx-tls-5b74c74f46-dq4rm
+Namespace:        default
+Priority:         0
+Service Account:  vault
+Node:             minikube/192.168.49.2
+Start Time:       Sat, 31 May 2025 08:54:25 +0900
+Labels:           app=nginx-tls
+                  pod-template-hash=5b74c74f46
+Annotations:      <none>
+Status:           Running
+IP:               10.244.3.29
+IPs:
+  IP:           10.244.3.29
+Controlled By:  ReplicaSet/nginx-tls-5b74c74f46
+Containers:
+  nginx:
+    Container ID:   docker://69b515d33ccd996066b572b2742243da9e77273c492c34c57edd9726e2ffde27
+    Image:          nginx:1.25
+    Image ID:       docker-pullable://nginx@sha256:a484819eb60211f5299034ac80f6a681b06f89e65866ce91f356ed7c72af059c
+    Port:           443/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Sat, 31 May 2025 08:54:49 +0900
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Sat, 31 May 2025 08:54:33 +0900
+      Finished:     Sat, 31 May 2025 08:54:34 +0900
+    Ready:          True
+    Restart Count:  2
+    Environment:    <none>
+    Mounts:
+      /etc/nginx/conf.d/default.conf from nginx-conf (rw,path="default.conf")
+      /etc/nginx/ssl from ssl (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-cndc7 (ro)
+  vault-agent:
+    Container ID:  docker://ba7a84e46738d00688a9e83718d194c5b50a8d711a20f41f04e9bc448175fbda
+    Image:         hashicorp/vault:1.15.4
+    Image ID:      docker-pullable://hashicorp/vault@sha256:0b01ed3924e613381793de3f5e429ea6b4d9dac28592472f8007315495aba061
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      vault
+      agent
+      -config=/etc/vault/config/vault-agent-config.hcl
+    State:          Running
+      Started:      Sat, 31 May 2025 08:54:32 +0900
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /etc/nginx/ssl from ssl (rw)
+      /etc/vault/config/vault-agent-config.hcl from nginx-conf (rw,path="vault-agent-config.hcl")
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-cndc7 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  ssl:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  nginx-conf:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      nginx-config
+    Optional:  false
+  kube-api-access-cndc7:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                  From               Message
+  ----     ------     ----                 ----               -------
+  Normal   Scheduled  116s                 default-scheduler  Successfully assigned default/nginx-tls-5b74c74f46-dq4rm to minikube
+  Normal   Pulled     111s                 kubelet            Container image "hashicorp/vault:1.15.4" already present on machine
+  Normal   Created    110s                 kubelet            Created container: vault-agent
+  Normal   Started    110s                 kubelet            Started container vault-agent
+  Warning  BackOff    106s (x2 over 107s)  kubelet            Back-off restarting failed container nginx in pod nginx-tls-5b74c74f46-dq4rm_default(761a59d8-f417-441e-bef4-345813246089)
+  Normal   Pulled     93s (x3 over 112s)   kubelet            Container image "nginx:1.25" already present on machine
+  Normal   Created    93s (x3 over 111s)   kubelet            Created container: nginx
+  Normal   Started    93s (x3 over 111s)   kubelet            Started container nginx
+
+
+Name:             postgres-b85d56587-lbhnh
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Sat, 31 May 2025 08:54:23 +0900
+Labels:           app=postgres
+                  pod-template-hash=b85d56587
+Annotations:      <none>
+Status:           Running
+IP:               10.244.3.25
+IPs:
+  IP:           10.244.3.25
+Controlled By:  ReplicaSet/postgres-b85d56587
+Containers:
+  postgres:
+    Container ID:   docker://e7e79db0abced4ca2a7c8f394df007f12f9e4cf7a989dd0596faf322593d4412
+    Image:          postgres:15
+    Image ID:       docker-pullable://postgres@sha256:8f6fbd24a12304d2adc332a2162ee9ff9d6044045a0b07f94d6e53e73125e11c
+    Port:           5432/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Sat, 31 May 2025 08:54:25 +0900
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      POSTGRES_DB:        inventorydb
+      POSTGRES_USER:      vaultadmin
+      POSTGRES_PASSWORD:  password
+    Mounts:
+      /var/lib/postgresql/data from postgres-storage (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-zmtmt (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  postgres-storage:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  kube-api-access-zmtmt:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  118s  default-scheduler  Successfully assigned default/postgres-b85d56587-lbhnh to minikube
+  Normal  Pulled     118s  kubelet            Container image "postgres:15" already present on machine
+  Normal  Created    118s  kubelet            Created container: postgres
+  Normal  Started    117s  kubelet            Started container postgres
+
+
+Name:             postgres-init-t2828
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Sat, 31 May 2025 08:54:23 +0900
+Labels:           batch.kubernetes.io/controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+                  batch.kubernetes.io/job-name=postgres-init
+                  controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+                  job-name=postgres-init
+Annotations:      <none>
+Status:           Succeeded
+IP:               10.244.3.27
+IPs:
+  IP:           10.244.3.27
+Controlled By:  Job/postgres-init
+Containers:
+  psql:
+    Container ID:  docker://994b95ba0da807bc764b3556354a91e4a841a6a5a04249a78607040d29035923
+    Image:         postgres:15
+    Image ID:      docker-pullable://postgres@sha256:8f6fbd24a12304d2adc332a2162ee9ff9d6044045a0b07f94d6e53e73125e11c
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      psql
+    Args:
+      -U
+      vaultadmin
+      -d
+      inventorydb
+      -h
+      postgres
+      -f
+      /sql/init.sql
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Sat, 31 May 2025 08:54:45 +0900
+      Finished:     Sat, 31 May 2025 08:54:45 +0900
+    Ready:          False
+    Restart Count:  2
+    Environment:
+      PGPASSWORD:  password
+    Mounts:
+      /sql from sql-volume (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-84vjd (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  sql-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      postgres-init-sql
+    Optional:  false
+  kube-api-access-84vjd:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                  From               Message
+  ----     ------     ----                 ----               -------
+  Normal   Scheduled  118s                 default-scheduler  Successfully assigned default/postgres-init-t2828 to minikube
+  Warning  BackOff    108s (x2 over 110s)  kubelet            Back-off restarting failed container psql in pod postgres-init-t2828_default(dbec76b0-d94a-4ee8-a5a1-ab6872928af6)
+  Normal   Pulled     97s (x3 over 116s)   kubelet            Container image "postgres:15" already present on machine
+  Normal   Created    97s (x3 over 115s)   kubelet            Created container: psql
+  Normal   Started    97s (x3 over 113s)   kubelet            Started container psql
+
+
+Name:             vault-0
+Namespace:        default
+Priority:         0
+Service Account:  vault
+Node:             minikube/192.168.49.2
+Start Time:       Sat, 31 May 2025 08:54:14 +0900
+Labels:           app.kubernetes.io/instance=vault
+                  app.kubernetes.io/name=vault
+                  apps.kubernetes.io/pod-index=0
+                  component=server
+                  controller-revision-hash=vault-6c6c65c574
+                  helm.sh/chart=vault-0.30.0
+                  statefulset.kubernetes.io/pod-name=vault-0
+Annotations:      <none>
+Status:           Running
+IP:               10.244.3.24
+IPs:
+  IP:           10.244.3.24
+Controlled By:  StatefulSet/vault
+Containers:
+  vault:
+    Container ID:  docker://f90956a9553cfbada2f37af426b2f44880b09977f91842798b78a3959b90c49a
+    Image:         hashicorp/vault:1.19.0
+    Image ID:      docker-pullable://hashicorp/vault@sha256:bbb7f98dc67d9ebdda1256de288df1cb9a5450990e48338043690bee3b332c90
+    Ports:         8200/TCP, 8201/TCP, 8202/TCP
+    Host Ports:    0/TCP, 0/TCP, 0/TCP
+    Command:
+      /bin/sh
+      -ec
+    Args:
+      /usr/local/bin/docker-entrypoint.sh vault server -dev 
+      
+    State:          Running
+      Started:      Sat, 31 May 2025 08:54:15 +0900
+    Ready:          True
+    Restart Count:  0
+    Readiness:      exec [/bin/sh -ec vault status -tls-skip-verify] delay=5s timeout=3s period=5s #success=1 #failure=2
+    Environment:
+      HOST_IP:                    (v1:status.hostIP)
+      POD_IP:                     (v1:status.podIP)
+      VAULT_K8S_POD_NAME:        vault-0 (v1:metadata.name)
+      VAULT_K8S_NAMESPACE:       default (v1:metadata.namespace)
+      VAULT_ADDR:                http://127.0.0.1:8200
+      VAULT_API_ADDR:            http://$(POD_IP):8200
+      SKIP_CHOWN:                true
+      SKIP_SETCAP:               true
+      HOSTNAME:                  vault-0 (v1:metadata.name)
+      VAULT_CLUSTER_ADDR:        https://$(HOSTNAME).vault-internal:8201
+      HOME:                      /home/vault
+      VAULT_DEV_ROOT_TOKEN_ID:   root
+      VAULT_DEV_LISTEN_ADDRESS:  [::]:8200
+      VAULT_DEV_ROOT_TOKEN_ID:   root
+    Mounts:
+      /home/vault from home (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-zpksm (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  home:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  kube-api-access-zpksm:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  2m7s  default-scheduler  Successfully assigned default/vault-0 to minikube
+  Normal  Pulled     2m7s  kubelet            Container image "hashicorp/vault:1.19.0" already present on machine
+  Normal  Created    2m7s  kubelet            Created container: vault
+  Normal  Started    2m7s  kubelet            Started container vault
+
+
+Name:             vault-agent-injector-75f9dfc9c8-4jthz
+Namespace:        default
+Priority:         0
+Service Account:  vault-agent-injector
+Node:             minikube/192.168.49.2
+Start Time:       Sat, 31 May 2025 08:54:14 +0900
+Labels:           app.kubernetes.io/instance=vault
+                  app.kubernetes.io/name=vault-agent-injector
+                  component=webhook
+                  pod-template-hash=75f9dfc9c8
+Annotations:      <none>
+Status:           Running
+IP:               10.244.3.23
+IPs:
+  IP:           10.244.3.23
+Controlled By:  ReplicaSet/vault-agent-injector-75f9dfc9c8
+Containers:
+  sidecar-injector:
+    Container ID:  docker://9b5d2fbe509dd288e499b5597abfe03812a91ba3609db78e8d02eef54b5c4cb8
+    Image:         hashicorp/vault-k8s:1.6.2
+    Image ID:      docker-pullable://hashicorp/vault-k8s@sha256:103a2d817a7474a8b678d830b0d6ed2d570cc878e4bc8c146d8d35ec436a8d49
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      agent-inject
+      2>&1
+    State:          Running
+      Started:      Sat, 31 May 2025 08:54:15 +0900
+    Ready:          True
+    Restart Count:  0
+    Liveness:       http-get https://:8080/health/ready delay=5s timeout=5s period=2s #success=1 #failure=2
+    Readiness:      http-get https://:8080/health/ready delay=5s timeout=5s period=2s #success=1 #failure=2
+    Startup:        http-get https://:8080/health/ready delay=5s timeout=5s period=5s #success=1 #failure=12
+    Environment:
+      AGENT_INJECT_LISTEN:                                 :8080
+      AGENT_INJECT_LOG_LEVEL:                              info
+      AGENT_INJECT_VAULT_ADDR:                             http://vault.default.svc:8200
+      AGENT_INJECT_VAULT_AUTH_PATH:                        auth/kubernetes
+      AGENT_INJECT_VAULT_IMAGE:                            hashicorp/vault:1.19.0
+      AGENT_INJECT_TLS_AUTO:                               vault-agent-injector-cfg
+      AGENT_INJECT_TLS_AUTO_HOSTS:                         vault-agent-injector-svc,vault-agent-injector-svc.default,vault-agent-injector-svc.default.svc
+      AGENT_INJECT_LOG_FORMAT:                             standard
+      AGENT_INJECT_REVOKE_ON_SHUTDOWN:                     false
+      AGENT_INJECT_CPU_REQUEST:                            250m
+      AGENT_INJECT_CPU_LIMIT:                              500m
+      AGENT_INJECT_MEM_REQUEST:                            64Mi
+      AGENT_INJECT_MEM_LIMIT:                              128Mi
+      AGENT_INJECT_DEFAULT_TEMPLATE:                       map
+      AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE:  true
+      POD_NAME:                                            vault-agent-injector-75f9dfc9c8-4jthz (v1:metadata.name)
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-twks4 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-twks4:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  2m8s  default-scheduler  Successfully assigned default/vault-agent-injector-75f9dfc9c8-4jthz to minikube
+  Normal  Pulled     2m8s  kubelet            Container image "hashicorp/vault-k8s:1.6.2" already present on machine
+  Normal  Created    2m7s  kubelet            Created container: sidecar-injector
+  Normal  Started    2m7s  kubelet            Started container sidecar-injector
+
+
+Name:             vault-init-jjcl5
+Namespace:        default
+Priority:         0
+Service Account:  vault
+Node:             minikube/192.168.49.2
+Start Time:       Sat, 31 May 2025 08:54:23 +0900
+Labels:           batch.kubernetes.io/controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+                  batch.kubernetes.io/job-name=vault-init
+                  controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+                  job-name=vault-init
+Annotations:      <none>
+Status:           Succeeded
+IP:               10.244.3.26
+IPs:
+  IP:           10.244.3.26
+Controlled By:  Job/vault-init
+Containers:
+  vault-init:
+    Container ID:  docker://925766dd304585dba4bc6f5d69bb220465d9ee390e933d153cd6e01d3c6af399
+    Image:         hashicorp/vault:1.15.4
+    Image ID:      docker-pullable://hashicorp/vault@sha256:0b01ed3924e613381793de3f5e429ea6b4d9dac28592472f8007315495aba061
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/sh
+      -c
+    Args:
+      set -e
+      export VAULT_ADDR=http://vault.default.svc:8200
+      
+      # Kubernetes Auth
+      vault auth enable kubernetes || true
+      vault write auth/kubernetes/config \
+        token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+        kubernetes_host="https://${KUBERNETES_PORT_443_TCP_ADDR}:443" \
+        kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      echo 'path "database/creds/readonly-role" { capabilities = ["read"] }' > /tmp/myapp-policy.hcl
+      vault policy write myapp-policy /tmp/myapp-policy.hcl
+      vault write auth/kubernetes/role/myapp-role \
+        bound_service_account_names=vault \
+        bound_service_account_namespaces=default \
+        policies=myapp-policy \
+        ttl=1h
+      echo 'path "pki-int/issue/nginx" { capabilities = ["update"] }' > /tmp/nginx-policy.hcl
+      vault policy write nginx-policy /tmp/nginx-policy.hcl
+      vault write auth/kubernetes/role/nginx-role \
+        bound_service_account_names=vault \
+        bound_service_account_namespaces=default \
+        policies=nginx-policy \
+        ttl=1h
+      
+      # Database
+      vault secrets enable database || true
+      vault write database/config/my-postgres-db \
+        plugin_name=postgresql-database-plugin \
+        allowed_roles=readonly-role \
+        connection_url="postgresql://{{username}}:{{password}}@postgres:5432/inventorydb?sslmode=disable" \
+        username="vaultadmin" \
+        password="password"
+      vault write database/roles/readonly-role \
+        db_name=my-postgres-db \
+        default_ttl="5" \
+        max_ttl="30" \
+        creation_statements=@/tmp/sql/readonly/readonly-role.sql
+      
+      # Transit
+      vault secrets enable -path=transit transit || true
+      vault write -f transit/keys/my-transit-key
+      
+      # PKI: Root
+      echo "Enable Root PKI"
+      vault secrets enable -path=pki-root pki || true
+      vault write pki-root/root/generate/internal \
+        common_name="Root CA" \
+        ttl=87600h
+      
+      # PKI: Intermediate
+      echo "Enable Intermediate PKI"
+      vault secrets enable -path=pki-int pki || true
+      vault write -format=json pki-int/intermediate/generate/internal \
+        common_name="nginx Intermediate CA" \
+        ttl=43800h > /tmp/intermediate-csr.json
+      
+      CSR=$(cat /tmp/intermediate-csr.json | grep '"csr"' | cut -d '"' -f4)
+      printf "%b\n" "$CSR" > /tmp/intermediate.csr.pem
+      
+      echo "Sign Intermediate CSR with Root"
+      vault write -format=json pki-root/root/sign-intermediate \
+        csr=@/tmp/intermediate.csr.pem \
+        format=pem ttl=43800h > /tmp/intermediate-cert.json
+      
+      CERT=$(cat /tmp/intermediate-cert.json | grep '"certificate"' | cut -d '"' -f4)
+      printf "%b\n" "$CERT" > /tmp/intermediate.cert.pem
+      
+      # 🔁 修正ポイント: Root証明書を取得してbundle作成
+      vault read -field=certificate pki-root/cert/ca > /tmp/root.cert.pem
+      cat /tmp/intermediate.cert.pem /tmp/root.cert.pem > /tmp/intermediate-bundle.cert.pem
+      
+      echo "Set signed intermediate certificate"
+      vault write pki-int/intermediate/set-signed \
+        certificate=@/tmp/intermediate-bundle.cert.pem
+      
+      echo "Set issuing/CRL URLs"
+      vault write pki-int/config/urls \
+        issuing_certificates="$VAULT_ADDR/v1/pki-int/ca" \
+        crl_distribution_points="$VAULT_ADDR/v1/pki-int/crl"
+      
+      echo "Create Role"
+      vault write pki-int/roles/nginx \
+        allowed_domains="nginx.example.com" \
+        allow_subdomains=true \
+        allow_bare_domains=true \
+        max_ttl="72h"
+      
+      echo "Vault PKI Init Complete"
+      
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Sat, 31 May 2025 08:54:35 +0900
+      Finished:     Sat, 31 May 2025 08:54:38 +0900
+    Ready:          False
+    Restart Count:  1
+    Environment:
+      VAULT_TOKEN:  root
+    Mounts:
+      /tmp/sql/init from init-sql-volume (rw)
+      /tmp/sql/readonly from readonly-role-volume (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-lrwjj (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  init-sql-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      postgres-init-sql
+    Optional:  false
+  readonly-role-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      readonly-role-sql
+    Optional:  false
+  kube-api-access-lrwjj:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age                  From               Message
+  ----    ------     ----                 ----               -------
+  Normal  Scheduled  118s                 default-scheduler  Successfully assigned default/vault-init-jjcl5 to minikube
+  Normal  Pulled     107s (x2 over 117s)  kubelet            Container image "hashicorp/vault:1.15.4" already present on machine
+  Normal  Created    107s (x2 over 117s)  kubelet            Created container: vault-init
+  Normal  Started    107s (x2 over 115s)  kubelet            Started container vault-init
+
+
+Name:                     demo-app
+Namespace:                default
+Labels:                   app=demo-app
+Annotations:              <none>
+Selector:                 app=demo-app
+Type:                     ClusterIP
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.102.216.68
+IPs:                      10.102.216.68
+Port:                     <unset>  5000/TCP
+TargetPort:               5000/TCP
+Endpoints:                10.244.3.28:5000
+Session Affinity:         None
+Internal Traffic Policy:  Cluster
+Events:                   <none>
+
+
+Name:                     kubernetes
+Namespace:                default
+Labels:                   component=apiserver
+                          provider=kubernetes
+Annotations:              <none>
+Selector:                 <none>
+Type:                     ClusterIP
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.96.0.1
+IPs:                      10.96.0.1
+Port:                     https  443/TCP
+TargetPort:               8443/TCP
+Endpoints:                192.168.49.2:8443
+Session Affinity:         None
+Internal Traffic Policy:  Cluster
+Events:                   <none>
+
+
+Name:                     nginx-tls
+Namespace:                default
+Labels:                   app=nginx-tls
+Annotations:              <none>
+Selector:                 app=nginx-tls
+Type:                     NodePort
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.104.213.202
+IPs:                      10.104.213.202
+Port:                     <unset>  443/TCP
+TargetPort:               443/TCP
+NodePort:                 <unset>  30443/TCP
+Endpoints:                10.244.3.29:443
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Internal Traffic Policy:  Cluster
+Events:                   <none>
+
+
+Name:                     postgres
+Namespace:                default
+Labels:                   app=postgres
+Annotations:              <none>
+Selector:                 app=postgres
+Type:                     ClusterIP
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.103.235.228
+IPs:                      10.103.235.228
+Port:                     <unset>  5432/TCP
+TargetPort:               5432/TCP
+Endpoints:                10.244.3.25:5432
+Session Affinity:         None
+Internal Traffic Policy:  Cluster
+Events:                   <none>
+
+
+Name:                     vault
+Namespace:                default
+Labels:                   app.kubernetes.io/instance=vault
+                          app.kubernetes.io/managed-by=Helm
+                          app.kubernetes.io/name=vault
+                          helm.sh/chart=vault-0.30.0
+Annotations:              meta.helm.sh/release-name: vault
+                          meta.helm.sh/release-namespace: default
+Selector:                 app.kubernetes.io/instance=vault,app.kubernetes.io/name=vault,component=server
+Type:                     ClusterIP
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.101.248.141
+IPs:                      10.101.248.141
+Port:                     http  8200/TCP
+TargetPort:               8200/TCP
+Endpoints:                10.244.3.24:8200
+Port:                     https-internal  8201/TCP
+TargetPort:               8201/TCP
+Endpoints:                10.244.3.24:8201
+Session Affinity:         None
+Internal Traffic Policy:  Cluster
+Events:                   <none>
+
+
+Name:                     vault-agent-injector-svc
+Namespace:                default
+Labels:                   app.kubernetes.io/instance=vault
+                          app.kubernetes.io/managed-by=Helm
+                          app.kubernetes.io/name=vault-agent-injector
+Annotations:              meta.helm.sh/release-name: vault
+                          meta.helm.sh/release-namespace: default
+Selector:                 app.kubernetes.io/instance=vault,app.kubernetes.io/name=vault-agent-injector,component=webhook
+Type:                     ClusterIP
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.107.255.29
+IPs:                      10.107.255.29
+Port:                     https  443/TCP
+TargetPort:               8080/TCP
+Endpoints:                10.244.3.23:8080
+Session Affinity:         None
+Internal Traffic Policy:  Cluster
+Events:                   <none>
+
+
+Name:                     vault-internal
+Namespace:                default
+Labels:                   app.kubernetes.io/instance=vault
+                          app.kubernetes.io/managed-by=Helm
+                          app.kubernetes.io/name=vault
+                          helm.sh/chart=vault-0.30.0
+                          vault-internal=true
+Annotations:              meta.helm.sh/release-name: vault
+                          meta.helm.sh/release-namespace: default
+Selector:                 app.kubernetes.io/instance=vault,app.kubernetes.io/name=vault,component=server
+Type:                     ClusterIP
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       None
+IPs:                      None
+Port:                     http  8200/TCP
+TargetPort:               8200/TCP
+Endpoints:                10.244.3.24:8200
+Port:                     https-internal  8201/TCP
+TargetPort:               8201/TCP
+Endpoints:                10.244.3.24:8201
+Session Affinity:         None
+Internal Traffic Policy:  Cluster
+Events:                   <none>
+
+
+Name:                   demo-app
+Namespace:              default
+CreationTimestamp:      Sat, 31 May 2025 08:54:24 +0900
+Labels:                 app=demo-app
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=demo-app
+Replicas:               1 desired | 1 updated | 1 total | 0 available | 1 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:           app=demo-app
+  Annotations:      vault.hashicorp.com/agent-init-first: true
+                    vault.hashicorp.com/agent-inject: true
+                    vault.hashicorp.com/agent-inject-secret-db-creds: database/creds/readonly-role
+                    vault.hashicorp.com/agent-inject-template-db-creds:
+                      {{- with secret "database/creds/readonly-role" -}}
+                      DB_USER={{ .Data.username }}
+                      DB_PASSWORD={{ .Data.password }}
+                      {{- end }}
+                    vault.hashicorp.com/agent-pre-populate: true
+                    vault.hashicorp.com/role: myapp-role
+  Service Account:  vault
+  Containers:
+   app:
+    Image:      python:3.11-slim
+    Port:       5000/TCP
+    Host Port:  0/TCP
+    Command:
+      /bin/sh
+      -c
+    Args:
+      pip install flask psycopg2-binary requests pyOpenSSL;
+      
+      cat <<EOF > app.py
+      from flask import Flask, request, render_template_string
+      import psycopg2, os, time, datetime, requests
+      
+      app = Flask(__name__)
+      
+      def load_env_file(path):
+          creds = {}
+          with open(path) as f:
+              for line in f:
+                  if "=" in line:
+                      k, v = line.strip().split("=", 1)
+                      creds[k] = v
+          return creds
+      
+      @app.route("/")
+      def index():
+          secret_path = "/vault/secrets/db-creds"
+          if not os.path.exists(secret_path):
+              return "<h2 style='color:red;'>Vaultのシークレットが見つかりません</h2>"
+          try:
+              creds = load_env_file(secret_path)
+          except Exception as e:
+              return f"<h2 style='color:red;'>シークレット読み込みエラー: {e}</h2>"
+      
+          try:
+              connection = psycopg2.connect(
+                  host="postgres",
+                  dbname="inventorydb",
+                  user=creds["DB_USER"],
+                  password=creds["DB_PASSWORD"]
+              )
+              cursor = connection.cursor()
+              cursor.execute("SELECT name, stock, updated_at FROM inventory")
+              items = [{"name": r[0], "stock": r[1], "updated_at": r[2]} for r in cursor.fetchall()]
+              cursor.close()
+              connection.close()
+          except Exception as db_err:
+              return f"<h2 style='color:red;'>DB接続エラー: {db_err}</h2>"
+      
+          html_template = '''
+          <!DOCTYPE html>
+          <html lang="ja">
+          <head>
+              <meta charset="UTF-8">
+              <title>在庫管理システム</title>
+              <style>
+                  body { font-family: sans-serif; margin: 40px; background-color: #f9f9f9; }
+                  h1 { color: #333; }
+                  table { width: 80%; border-collapse: collapse; margin-top: 20px; }
+                  th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
+                  th { background-color: #f0f0f0; }
+                  tr:nth-child(even) { background-color: #fdfdfd; }
+              </style>
+          </head>
+          <body>
+              <h1>在庫管理ダッシュボード</h1>
+              <table>
+                  <thead>
+                      <tr>
+                          <th>商品名</th>
+                          <th>在庫数</th>
+                          <th>最終更新日</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for item in items %}
+                      <tr>
+                          <td>{{ item['name'] }}</td>
+                          <td>{{ item['stock'] }}</td>
+                          <td>{{ item['updated_at'] }}</td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </body>
+          </html>
+          '''
+          return render_template_string(html_template, items=items)
+      
+      @app.route("/transit", methods=["GET", "POST"])
+      def transit_demo():
+          VAULT_ADDR = "http://vault:8200"
+          VAULT_TOKEN = "root"
+          KEY_NAME = "my-transit-key"
+      
+          encrypt_input = decrypt_input = ""
+          ciphertext = plaintext = ""
+          encrypt_curl = decrypt_curl = ""
+      
+          if request.method == "POST":
+              mode = request.form.get("mode")
+      
+              if mode == "encrypt":
+                  encrypt_input = request.form["encrypt_input"]
+                  b64 = encrypt_input.encode("utf-8").hex()
+                  res = requests.post(
+                      f"{VAULT_ADDR}/v1/transit/encrypt/{KEY_NAME}",
+                      headers={"X-Vault-Token": VAULT_TOKEN},
+                      json={"plaintext": b64}
+                  ).json()
+                  ciphertext = res["data"]["ciphertext"]
+                  encrypt_curl = f"curl -s -H 'X-Vault-Token: {VAULT_TOKEN}' -d '{{\"plaintext\":\"{b64}\"}}' {VAULT_ADDR}/v1/transit/encrypt/{KEY_NAME}"
+      
+              elif mode == "decrypt":
+                  decrypt_input = request.form["decrypt_input"]
+                  res = requests.post(
+                      f"{VAULT_ADDR}/v1/transit/decrypt/{KEY_NAME}",
+                      headers={"X-Vault-Token": VAULT_TOKEN},
+                      json={"ciphertext": decrypt_input}
+                  ).json()
+                  dec = res["data"]["plaintext"]
+                  plaintext = bytes.fromhex(dec).decode("utf-8")
+                  decrypt_curl = f"curl -s -H 'X-Vault-Token: {VAULT_TOKEN}' -d '{{\"ciphertext\":\"{decrypt_input}\"}}' {VAULT_ADDR}/v1/transit/decrypt/{KEY_NAME}"
+      
+          return f"""
+          <html>
+          <body>
+            <h2>🔐 Vault Transit Engine Demo</h2>
+            <a href="/">⬅ DB Secret デモへ戻る</a>
+            <form method="post">
+              <input type="hidden" name="mode" value="encrypt" />
+              <label>平文:</label><br>
+              <input name="encrypt_input" value="{encrypt_input}" /><br><br>
+              <button type="submit">🔒 暗号化</button>
+            </form>
+            <pre>{ciphertext}</pre>
+            <form method="post">
+              <input type="hidden" name="mode" value="decrypt" />
+              <label>暗号文:</label><br>
+              <textarea name="decrypt_input">{decrypt_input}</textarea><br>
+              <button type="submit">🔓 復号化</button>
+            </form>
+            <pre>{plaintext}</pre>
+          </body>
+          </html>
+          """
+      
+      if __name__ == "__main__":
+          app.run(host="0.0.0.0", port=5000)
+      EOF
+      
+      python app.py
+      
+    Environment:  <none>
+    Mounts:
+      /etc/tls from tls-certs (ro)
+  Volumes:
+   tls-certs:
+    Type:          EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:        
+    SizeLimit:     <unset>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      False   MinimumReplicasUnavailable
+  Progressing    True    ReplicaSetUpdated
+OldReplicaSets:  <none>
+NewReplicaSet:   demo-app-64dc955864 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  118s  deployment-controller  Scaled up replica set demo-app-64dc955864 from 0 to 1
+
+
+Name:                   nginx-tls
+Namespace:              default
+CreationTimestamp:      Sat, 31 May 2025 08:54:24 +0900
+Labels:                 app=nginx-tls
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=nginx-tls
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:           app=nginx-tls
+  Service Account:  vault
+  Containers:
+   nginx:
+    Image:        nginx:1.25
+    Port:         443/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:
+      /etc/nginx/conf.d/default.conf from nginx-conf (rw,path="default.conf")
+      /etc/nginx/ssl from ssl (rw)
+   vault-agent:
+    Image:      hashicorp/vault:1.15.4
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      vault
+      agent
+      -config=/etc/vault/config/vault-agent-config.hcl
+    Environment:  <none>
+    Mounts:
+      /etc/nginx/ssl from ssl (rw)
+      /etc/vault/config/vault-agent-config.hcl from nginx-conf (rw,path="vault-agent-config.hcl")
+  Volumes:
+   ssl:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+   nginx-conf:
+    Type:          ConfigMap (a volume populated by a ConfigMap)
+    Name:          nginx-config
+    Optional:      false
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   nginx-tls-5b74c74f46 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  117s  deployment-controller  Scaled up replica set nginx-tls-5b74c74f46 from 0 to 1
+
+
+Name:                   postgres
+Namespace:              default
+CreationTimestamp:      Sat, 31 May 2025 08:54:23 +0900
+Labels:                 app=postgres
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=postgres
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=postgres
+  Containers:
+   postgres:
+    Image:      postgres:15
+    Port:       5432/TCP
+    Host Port:  0/TCP
+    Environment:
+      POSTGRES_DB:        inventorydb
+      POSTGRES_USER:      vaultadmin
+      POSTGRES_PASSWORD:  password
+    Mounts:
+      /var/lib/postgresql/data from postgres-storage (rw)
+  Volumes:
+   postgres-storage:
+    Type:          EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:        
+    SizeLimit:     <unset>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   postgres-b85d56587 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  119s  deployment-controller  Scaled up replica set postgres-b85d56587 from 0 to 1
+
+
+Name:                   vault-agent-injector
+Namespace:              default
+CreationTimestamp:      Sat, 31 May 2025 08:54:14 +0900
+Labels:                 app.kubernetes.io/instance=vault
+                        app.kubernetes.io/managed-by=Helm
+                        app.kubernetes.io/name=vault-agent-injector
+                        component=webhook
+Annotations:            deployment.kubernetes.io/revision: 1
+                        meta.helm.sh/release-name: vault
+                        meta.helm.sh/release-namespace: default
+Selector:               app.kubernetes.io/instance=vault,app.kubernetes.io/name=vault-agent-injector,component=webhook
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:           app.kubernetes.io/instance=vault
+                    app.kubernetes.io/name=vault-agent-injector
+                    component=webhook
+  Service Account:  vault-agent-injector
+  Containers:
+   sidecar-injector:
+    Image:      hashicorp/vault-k8s:1.6.2
+    Port:       <none>
+    Host Port:  <none>
+    Args:
+      agent-inject
+      2>&1
+    Liveness:   http-get https://:8080/health/ready delay=5s timeout=5s period=2s #success=1 #failure=2
+    Readiness:  http-get https://:8080/health/ready delay=5s timeout=5s period=2s #success=1 #failure=2
+    Startup:    http-get https://:8080/health/ready delay=5s timeout=5s period=5s #success=1 #failure=12
+    Environment:
+      AGENT_INJECT_LISTEN:                                 :8080
+      AGENT_INJECT_LOG_LEVEL:                              info
+      AGENT_INJECT_VAULT_ADDR:                             http://vault.default.svc:8200
+      AGENT_INJECT_VAULT_AUTH_PATH:                        auth/kubernetes
+      AGENT_INJECT_VAULT_IMAGE:                            hashicorp/vault:1.19.0
+      AGENT_INJECT_TLS_AUTO:                               vault-agent-injector-cfg
+      AGENT_INJECT_TLS_AUTO_HOSTS:                         vault-agent-injector-svc,vault-agent-injector-svc.default,vault-agent-injector-svc.default.svc
+      AGENT_INJECT_LOG_FORMAT:                             standard
+      AGENT_INJECT_REVOKE_ON_SHUTDOWN:                     false
+      AGENT_INJECT_CPU_REQUEST:                            250m
+      AGENT_INJECT_CPU_LIMIT:                              500m
+      AGENT_INJECT_MEM_REQUEST:                            64Mi
+      AGENT_INJECT_MEM_LIMIT:                              128Mi
+      AGENT_INJECT_DEFAULT_TEMPLATE:                       map
+      AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE:  true
+      POD_NAME:                                             (v1:metadata.name)
+    Mounts:                                                <none>
+  Volumes:                                                 <none>
+  Node-Selectors:                                          <none>
+  Tolerations:                                             <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   vault-agent-injector-75f9dfc9c8 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  2m8s  deployment-controller  Scaled up replica set vault-agent-injector-75f9dfc9c8 from 0 to 1
+
+
+Name:           demo-app-64dc955864
+Namespace:      default
+Selector:       app=demo-app,pod-template-hash=64dc955864
+Labels:         app=demo-app
+                pod-template-hash=64dc955864
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 1
+Controlled By:  Deployment/demo-app
+Replicas:       1 current / 1 desired
+Pods Status:    0 Running / 1 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:           app=demo-app
+                    pod-template-hash=64dc955864
+  Annotations:      vault.hashicorp.com/agent-init-first: true
+                    vault.hashicorp.com/agent-inject: true
+                    vault.hashicorp.com/agent-inject-secret-db-creds: database/creds/readonly-role
+                    vault.hashicorp.com/agent-inject-template-db-creds:
+                      {{- with secret "database/creds/readonly-role" -}}
+                      DB_USER={{ .Data.username }}
+                      DB_PASSWORD={{ .Data.password }}
+                      {{- end }}
+                    vault.hashicorp.com/agent-pre-populate: true
+                    vault.hashicorp.com/role: myapp-role
+  Service Account:  vault
+  Containers:
+   app:
+    Image:      python:3.11-slim
+    Port:       5000/TCP
+    Host Port:  0/TCP
+    Command:
+      /bin/sh
+      -c
+    Args:
+      pip install flask psycopg2-binary requests pyOpenSSL;
+      
+      cat <<EOF > app.py
+      from flask import Flask, request, render_template_string
+      import psycopg2, os, time, datetime, requests
+      
+      app = Flask(__name__)
+      
+      def load_env_file(path):
+          creds = {}
+          with open(path) as f:
+              for line in f:
+                  if "=" in line:
+                      k, v = line.strip().split("=", 1)
+                      creds[k] = v
+          return creds
+      
+      @app.route("/")
+      def index():
+          secret_path = "/vault/secrets/db-creds"
+          if not os.path.exists(secret_path):
+              return "<h2 style='color:red;'>Vaultのシークレットが見つかりません</h2>"
+          try:
+              creds = load_env_file(secret_path)
+          except Exception as e:
+              return f"<h2 style='color:red;'>シークレット読み込みエラー: {e}</h2>"
+      
+          try:
+              connection = psycopg2.connect(
+                  host="postgres",
+                  dbname="inventorydb",
+                  user=creds["DB_USER"],
+                  password=creds["DB_PASSWORD"]
+              )
+              cursor = connection.cursor()
+              cursor.execute("SELECT name, stock, updated_at FROM inventory")
+              items = [{"name": r[0], "stock": r[1], "updated_at": r[2]} for r in cursor.fetchall()]
+              cursor.close()
+              connection.close()
+          except Exception as db_err:
+              return f"<h2 style='color:red;'>DB接続エラー: {db_err}</h2>"
+      
+          html_template = '''
+          <!DOCTYPE html>
+          <html lang="ja">
+          <head>
+              <meta charset="UTF-8">
+              <title>在庫管理システム</title>
+              <style>
+                  body { font-family: sans-serif; margin: 40px; background-color: #f9f9f9; }
+                  h1 { color: #333; }
+                  table { width: 80%; border-collapse: collapse; margin-top: 20px; }
+                  th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
+                  th { background-color: #f0f0f0; }
+                  tr:nth-child(even) { background-color: #fdfdfd; }
+              </style>
+          </head>
+          <body>
+              <h1>在庫管理ダッシュボード</h1>
+              <table>
+                  <thead>
+                      <tr>
+                          <th>商品名</th>
+                          <th>在庫数</th>
+                          <th>最終更新日</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for item in items %}
+                      <tr>
+                          <td>{{ item['name'] }}</td>
+                          <td>{{ item['stock'] }}</td>
+                          <td>{{ item['updated_at'] }}</td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </body>
+          </html>
+          '''
+          return render_template_string(html_template, items=items)
+      
+      @app.route("/transit", methods=["GET", "POST"])
+      def transit_demo():
+          VAULT_ADDR = "http://vault:8200"
+          VAULT_TOKEN = "root"
+          KEY_NAME = "my-transit-key"
+      
+          encrypt_input = decrypt_input = ""
+          ciphertext = plaintext = ""
+          encrypt_curl = decrypt_curl = ""
+      
+          if request.method == "POST":
+              mode = request.form.get("mode")
+      
+              if mode == "encrypt":
+                  encrypt_input = request.form["encrypt_input"]
+                  b64 = encrypt_input.encode("utf-8").hex()
+                  res = requests.post(
+                      f"{VAULT_ADDR}/v1/transit/encrypt/{KEY_NAME}",
+                      headers={"X-Vault-Token": VAULT_TOKEN},
+                      json={"plaintext": b64}
+                  ).json()
+                  ciphertext = res["data"]["ciphertext"]
+                  encrypt_curl = f"curl -s -H 'X-Vault-Token: {VAULT_TOKEN}' -d '{{\"plaintext\":\"{b64}\"}}' {VAULT_ADDR}/v1/transit/encrypt/{KEY_NAME}"
+      
+              elif mode == "decrypt":
+                  decrypt_input = request.form["decrypt_input"]
+                  res = requests.post(
+                      f"{VAULT_ADDR}/v1/transit/decrypt/{KEY_NAME}",
+                      headers={"X-Vault-Token": VAULT_TOKEN},
+                      json={"ciphertext": decrypt_input}
+                  ).json()
+                  dec = res["data"]["plaintext"]
+                  plaintext = bytes.fromhex(dec).decode("utf-8")
+                  decrypt_curl = f"curl -s -H 'X-Vault-Token: {VAULT_TOKEN}' -d '{{\"ciphertext\":\"{decrypt_input}\"}}' {VAULT_ADDR}/v1/transit/decrypt/{KEY_NAME}"
+      
+          return f"""
+          <html>
+          <body>
+            <h2>🔐 Vault Transit Engine Demo</h2>
+            <a href="/">⬅ DB Secret デモへ戻る</a>
+            <form method="post">
+              <input type="hidden" name="mode" value="encrypt" />
+              <label>平文:</label><br>
+              <input name="encrypt_input" value="{encrypt_input}" /><br><br>
+              <button type="submit">🔒 暗号化</button>
+            </form>
+            <pre>{ciphertext}</pre>
+            <form method="post">
+              <input type="hidden" name="mode" value="decrypt" />
+              <label>暗号文:</label><br>
+              <textarea name="decrypt_input">{decrypt_input}</textarea><br>
+              <button type="submit">🔓 復号化</button>
+            </form>
+            <pre>{plaintext}</pre>
+          </body>
+          </html>
+          """
+      
+      if __name__ == "__main__":
+          app.run(host="0.0.0.0", port=5000)
+      EOF
+      
+      python app.py
+      
+    Environment:  <none>
+    Mounts:
+      /etc/tls from tls-certs (ro)
+  Volumes:
+   tls-certs:
+    Type:          EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:        
+    SizeLimit:     <unset>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Events:
+  Type    Reason            Age   From                   Message
+  ----    ------            ----  ----                   -------
+  Normal  SuccessfulCreate  118s  replicaset-controller  Created pod: demo-app-64dc955864-6bw7s
+
+
+Name:           nginx-tls-5b74c74f46
+Namespace:      default
+Selector:       app=nginx-tls,pod-template-hash=5b74c74f46
+Labels:         app=nginx-tls
+                pod-template-hash=5b74c74f46
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 1
+Controlled By:  Deployment/nginx-tls
+Replicas:       1 current / 1 desired
+Pods Status:    1 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:           app=nginx-tls
+                    pod-template-hash=5b74c74f46
+  Service Account:  vault
+  Containers:
+   nginx:
+    Image:        nginx:1.25
+    Port:         443/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:
+      /etc/nginx/conf.d/default.conf from nginx-conf (rw,path="default.conf")
+      /etc/nginx/ssl from ssl (rw)
+   vault-agent:
+    Image:      hashicorp/vault:1.15.4
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      vault
+      agent
+      -config=/etc/vault/config/vault-agent-config.hcl
+    Environment:  <none>
+    Mounts:
+      /etc/nginx/ssl from ssl (rw)
+      /etc/vault/config/vault-agent-config.hcl from nginx-conf (rw,path="vault-agent-config.hcl")
+  Volumes:
+   ssl:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+   nginx-conf:
+    Type:          ConfigMap (a volume populated by a ConfigMap)
+    Name:          nginx-config
+    Optional:      false
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Events:
+  Type    Reason            Age   From                   Message
+  ----    ------            ----  ----                   -------
+  Normal  SuccessfulCreate  117s  replicaset-controller  Created pod: nginx-tls-5b74c74f46-dq4rm
+
+
+Name:           postgres-b85d56587
+Namespace:      default
+Selector:       app=postgres,pod-template-hash=b85d56587
+Labels:         app=postgres
+                pod-template-hash=b85d56587
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 1
+Controlled By:  Deployment/postgres
+Replicas:       1 current / 1 desired
+Pods Status:    1 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=postgres
+           pod-template-hash=b85d56587
+  Containers:
+   postgres:
+    Image:      postgres:15
+    Port:       5432/TCP
+    Host Port:  0/TCP
+    Environment:
+      POSTGRES_DB:        inventorydb
+      POSTGRES_USER:      vaultadmin
+      POSTGRES_PASSWORD:  password
+    Mounts:
+      /var/lib/postgresql/data from postgres-storage (rw)
+  Volumes:
+   postgres-storage:
+    Type:          EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:        
+    SizeLimit:     <unset>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Events:
+  Type    Reason            Age   From                   Message
+  ----    ------            ----  ----                   -------
+  Normal  SuccessfulCreate  119s  replicaset-controller  Created pod: postgres-b85d56587-lbhnh
+
+
+Name:           vault-agent-injector-75f9dfc9c8
+Namespace:      default
+Selector:       app.kubernetes.io/instance=vault,app.kubernetes.io/name=vault-agent-injector,component=webhook,pod-template-hash=75f9dfc9c8
+Labels:         app.kubernetes.io/instance=vault
+                app.kubernetes.io/name=vault-agent-injector
+                component=webhook
+                pod-template-hash=75f9dfc9c8
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 1
+                meta.helm.sh/release-name: vault
+                meta.helm.sh/release-namespace: default
+Controlled By:  Deployment/vault-agent-injector
+Replicas:       1 current / 1 desired
+Pods Status:    1 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:           app.kubernetes.io/instance=vault
+                    app.kubernetes.io/name=vault-agent-injector
+                    component=webhook
+                    pod-template-hash=75f9dfc9c8
+  Service Account:  vault-agent-injector
+  Containers:
+   sidecar-injector:
+    Image:      hashicorp/vault-k8s:1.6.2
+    Port:       <none>
+    Host Port:  <none>
+    Args:
+      agent-inject
+      2>&1
+    Liveness:   http-get https://:8080/health/ready delay=5s timeout=5s period=2s #success=1 #failure=2
+    Readiness:  http-get https://:8080/health/ready delay=5s timeout=5s period=2s #success=1 #failure=2
+    Startup:    http-get https://:8080/health/ready delay=5s timeout=5s period=5s #success=1 #failure=12
+    Environment:
+      AGENT_INJECT_LISTEN:                                 :8080
+      AGENT_INJECT_LOG_LEVEL:                              info
+      AGENT_INJECT_VAULT_ADDR:                             http://vault.default.svc:8200
+      AGENT_INJECT_VAULT_AUTH_PATH:                        auth/kubernetes
+      AGENT_INJECT_VAULT_IMAGE:                            hashicorp/vault:1.19.0
+      AGENT_INJECT_TLS_AUTO:                               vault-agent-injector-cfg
+      AGENT_INJECT_TLS_AUTO_HOSTS:                         vault-agent-injector-svc,vault-agent-injector-svc.default,vault-agent-injector-svc.default.svc
+      AGENT_INJECT_LOG_FORMAT:                             standard
+      AGENT_INJECT_REVOKE_ON_SHUTDOWN:                     false
+      AGENT_INJECT_CPU_REQUEST:                            250m
+      AGENT_INJECT_CPU_LIMIT:                              500m
+      AGENT_INJECT_MEM_REQUEST:                            64Mi
+      AGENT_INJECT_MEM_LIMIT:                              128Mi
+      AGENT_INJECT_DEFAULT_TEMPLATE:                       map
+      AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE:  true
+      POD_NAME:                                             (v1:metadata.name)
+    Mounts:                                                <none>
+  Volumes:                                                 <none>
+  Node-Selectors:                                          <none>
+  Tolerations:                                             <none>
+Events:
+  Type    Reason            Age   From                   Message
+  ----    ------            ----  ----                   -------
+  Normal  SuccessfulCreate  2m8s  replicaset-controller  Created pod: vault-agent-injector-75f9dfc9c8-4jthz
+
+
+Name:               vault
+Namespace:          default
+CreationTimestamp:  Sat, 31 May 2025 08:54:14 +0900
+Selector:           app.kubernetes.io/instance=vault,app.kubernetes.io/name=vault,component=server
+Labels:             app.kubernetes.io/instance=vault
+                    app.kubernetes.io/managed-by=Helm
+                    app.kubernetes.io/name=vault
+Annotations:        meta.helm.sh/release-name: vault
+                    meta.helm.sh/release-namespace: default
+Replicas:           1 desired | 1 total
+Update Strategy:    OnDelete
+Pods Status:        1 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:           app.kubernetes.io/instance=vault
+                    app.kubernetes.io/name=vault
+                    component=server
+                    helm.sh/chart=vault-0.30.0
+  Service Account:  vault
+  Containers:
+   vault:
+    Image:       hashicorp/vault:1.19.0
+    Ports:       8200/TCP, 8201/TCP, 8202/TCP
+    Host Ports:  0/TCP, 0/TCP, 0/TCP
+    Command:
+      /bin/sh
+      -ec
+    Args:
+      /usr/local/bin/docker-entrypoint.sh vault server -dev 
+      
+    Readiness:  exec [/bin/sh -ec vault status -tls-skip-verify] delay=5s timeout=3s period=5s #success=1 #failure=2
+    Environment:
+      HOST_IP:                    (v1:status.hostIP)
+      POD_IP:                     (v1:status.podIP)
+      VAULT_K8S_POD_NAME:         (v1:metadata.name)
+      VAULT_K8S_NAMESPACE:        (v1:metadata.namespace)
+      VAULT_ADDR:                http://127.0.0.1:8200
+      VAULT_API_ADDR:            http://$(POD_IP):8200
+      SKIP_CHOWN:                true
+      SKIP_SETCAP:               true
+      HOSTNAME:                   (v1:metadata.name)
+      VAULT_CLUSTER_ADDR:        https://$(HOSTNAME).vault-internal:8201
+      HOME:                      /home/vault
+      VAULT_DEV_ROOT_TOKEN_ID:   root
+      VAULT_DEV_LISTEN_ADDRESS:  [::]:8200
+      VAULT_DEV_ROOT_TOKEN_ID:   root
+    Mounts:
+      /home/vault from home (rw)
+  Volumes:
+   home:
+    Type:          EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:        
+    SizeLimit:     <unset>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Volume Claims:     <none>
+Events:
+  Type    Reason            Age   From                    Message
+  ----    ------            ----  ----                    -------
+  Normal  SuccessfulCreate  2m8s  statefulset-controller  create Pod vault-0 in StatefulSet vault successful
+
+
+Name:             postgres-init
+Namespace:        default
+Selector:         batch.kubernetes.io/controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+Labels:           batch.kubernetes.io/controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+                  batch.kubernetes.io/job-name=postgres-init
+                  controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+                  job-name=postgres-init
+Annotations:      <none>
+Parallelism:      1
+Completions:      1
+Completion Mode:  NonIndexed
+Suspend:          false
+Backoff Limit:    6
+Start Time:       Sat, 31 May 2025 08:54:23 +0900
+Completed At:     Sat, 31 May 2025 08:54:47 +0900
+Duration:         24s
+Pods Statuses:    0 Active (0 Ready) / 1 Succeeded / 0 Failed
+Pod Template:
+  Labels:  batch.kubernetes.io/controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+           batch.kubernetes.io/job-name=postgres-init
+           controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+           job-name=postgres-init
+  Containers:
+   psql:
+    Image:      postgres:15
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      psql
+    Args:
+      -U
+      vaultadmin
+      -d
+      inventorydb
+      -h
+      postgres
+      -f
+      /sql/init.sql
+    Environment:
+      PGPASSWORD:  password
+    Mounts:
+      /sql from sql-volume (rw)
+  Volumes:
+   sql-volume:
+    Type:          ConfigMap (a volume populated by a ConfigMap)
+    Name:          postgres-init-sql
+    Optional:      false
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Events:
+  Type    Reason            Age   From            Message
+  ----    ------            ----  ----            -------
+  Normal  SuccessfulCreate  119s  job-controller  Created pod: postgres-init-t2828
+  Normal  Completed         95s   job-controller  Job completed
+
+
+Name:             vault-init
+Namespace:        default
+Selector:         batch.kubernetes.io/controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+Labels:           batch.kubernetes.io/controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+                  batch.kubernetes.io/job-name=vault-init
+                  controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+                  job-name=vault-init
+Annotations:      <none>
+Parallelism:      1
+Completions:      1
+Completion Mode:  NonIndexed
+Suspend:          false
+Backoff Limit:    6
+Start Time:       Sat, 31 May 2025 08:54:23 +0900
+Completed At:     Sat, 31 May 2025 08:54:41 +0900
+Duration:         18s
+Pods Statuses:    0 Active (0 Ready) / 1 Succeeded / 0 Failed
+Pod Template:
+  Labels:           batch.kubernetes.io/controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+                    batch.kubernetes.io/job-name=vault-init
+                    controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+                    job-name=vault-init
+  Service Account:  vault
+  Containers:
+   vault-init:
+    Image:      hashicorp/vault:1.15.4
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      /bin/sh
+      -c
+    Args:
+      set -e
+      export VAULT_ADDR=http://vault.default.svc:8200
+      
+      # Kubernetes Auth
+      vault auth enable kubernetes || true
+      vault write auth/kubernetes/config \
+        token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+        kubernetes_host="https://${KUBERNETES_PORT_443_TCP_ADDR}:443" \
+        kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      echo 'path "database/creds/readonly-role" { capabilities = ["read"] }' > /tmp/myapp-policy.hcl
+      vault policy write myapp-policy /tmp/myapp-policy.hcl
+      vault write auth/kubernetes/role/myapp-role \
+        bound_service_account_names=vault \
+        bound_service_account_namespaces=default \
+        policies=myapp-policy \
+        ttl=1h
+      echo 'path "pki-int/issue/nginx" { capabilities = ["update"] }' > /tmp/nginx-policy.hcl
+      vault policy write nginx-policy /tmp/nginx-policy.hcl
+      vault write auth/kubernetes/role/nginx-role \
+        bound_service_account_names=vault \
+        bound_service_account_namespaces=default \
+        policies=nginx-policy \
+        ttl=1h
+      
+      # Database
+      vault secrets enable database || true
+      vault write database/config/my-postgres-db \
+        plugin_name=postgresql-database-plugin \
+        allowed_roles=readonly-role \
+        connection_url="postgresql://{{username}}:{{password}}@postgres:5432/inventorydb?sslmode=disable" \
+        username="vaultadmin" \
+        password="password"
+      vault write database/roles/readonly-role \
+        db_name=my-postgres-db \
+        default_ttl="5" \
+        max_ttl="30" \
+        creation_statements=@/tmp/sql/readonly/readonly-role.sql
+      
+      # Transit
+      vault secrets enable -path=transit transit || true
+      vault write -f transit/keys/my-transit-key
+      
+      # PKI: Root
+      echo "Enable Root PKI"
+      vault secrets enable -path=pki-root pki || true
+      vault write pki-root/root/generate/internal \
+        common_name="Root CA" \
+        ttl=87600h
+      
+      # PKI: Intermediate
+      echo "Enable Intermediate PKI"
+      vault secrets enable -path=pki-int pki || true
+      vault write -format=json pki-int/intermediate/generate/internal \
+        common_name="nginx Intermediate CA" \
+        ttl=43800h > /tmp/intermediate-csr.json
+      
+      CSR=$(cat /tmp/intermediate-csr.json | grep '"csr"' | cut -d '"' -f4)
+      printf "%b\n" "$CSR" > /tmp/intermediate.csr.pem
+      
+      echo "Sign Intermediate CSR with Root"
+      vault write -format=json pki-root/root/sign-intermediate \
+        csr=@/tmp/intermediate.csr.pem \
+        format=pem ttl=43800h > /tmp/intermediate-cert.json
+      
+      CERT=$(cat /tmp/intermediate-cert.json | grep '"certificate"' | cut -d '"' -f4)
+      printf "%b\n" "$CERT" > /tmp/intermediate.cert.pem
+      
+      # 🔁 修正ポイント: Root証明書を取得してbundle作成
+      vault read -field=certificate pki-root/cert/ca > /tmp/root.cert.pem
+      cat /tmp/intermediate.cert.pem /tmp/root.cert.pem > /tmp/intermediate-bundle.cert.pem
+      
+      echo "Set signed intermediate certificate"
+      vault write pki-int/intermediate/set-signed \
+        certificate=@/tmp/intermediate-bundle.cert.pem
+      
+      echo "Set issuing/CRL URLs"
+      vault write pki-int/config/urls \
+        issuing_certificates="$VAULT_ADDR/v1/pki-int/ca" \
+        crl_distribution_points="$VAULT_ADDR/v1/pki-int/crl"
+      
+      echo "Create Role"
+      vault write pki-int/roles/nginx \
+        allowed_domains="nginx.example.com" \
+        allow_subdomains=true \
+        allow_bare_domains=true \
+        max_ttl="72h"
+      
+      echo "Vault PKI Init Complete"
+      
+    Environment:
+      VAULT_TOKEN:  root
+    Mounts:
+      /tmp/sql/init from init-sql-volume (rw)
+      /tmp/sql/readonly from readonly-role-volume (rw)
+  Volumes:
+   init-sql-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      postgres-init-sql
+    Optional:  false
+   readonly-role-volume:
+    Type:          ConfigMap (a volume populated by a ConfigMap)
+    Name:          readonly-role-sql
+    Optional:      false
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Events:
+  Type    Reason            Age   From            Message
+  ----    ------            ----  ----            -------
+  Normal  SuccessfulCreate  119s  job-controller  Created pod: vault-init-jjcl5
+  Normal  Completed         101s  job-controller  Job completed
