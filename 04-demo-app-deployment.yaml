@@ -71,45 +71,63 @@ spec:
                   except Exception as db_err:
                       return f"<h2 style='color:red;'>DB接続エラー: {db_err}</h2>"
 
+                  try:
+                      updated = os.path.getmtime(secret_path)
+                      updated_str = datetime.datetime.fromtimestamp(updated).strftime('%Y-%m-%d %H:%M:%S')
+                      vault_max_ttl = 30
+                      remaining = max(0, int(vault_max_ttl - (time.time() - updated)))
+                  except Exception:
+                      updated_str = "不明"
+                      remaining = "不明"
+
                   html_template = '''
                   <!DOCTYPE html>
                   <html lang="ja">
                   <head>
                       <meta charset="UTF-8">
-                      <title>在庫管理システム</title>
+                      <title>在庫管理ダッシュボード</title>
+                      <meta http-equiv="refresh" content="3">
+                      <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
                       <style>
-                          body { font-family: sans-serif; margin: 40px; background-color: #f9f9f9; }
-                          h1 { color: #333; }
-                          table { width: 80%; border-collapse: collapse; margin-top: 20px; }
-                          th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
-                          th { background-color: #f0f0f0; }
-                          tr:nth-child(even) { background-color: #fdfdfd; }
+                          body { font-family: 'Roboto', sans-serif; background-color: #f0f2f5; margin: 0; padding: 40px; }
+                          h1 { text-align: center; color: #333; margin-bottom: 30px; }
+                          .cards { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+                          .card { background-color: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; width: 280px; transition: transform 0.2s; }
+                          .card:hover { transform: translateY(-5px); }
+                          .card h3 { margin-top: 0; color: #444; }
+                          .card .stock { font-size: 1.2em; margin: 10px 0; }
+                          .card .updated { color: #888; font-size: 0.9em; }
+                          .section { margin-top: 40px; text-align: center; }
+                          .section ul { list-style: none; padding: 0; margin: 0 auto; display: inline-block; text-align: left; }
+                          .section li { background: #fff; margin: 5px 0; padding: 10px 20px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
                       </style>
                   </head>
                   <body>
-                      <h1>在庫管理ダッシュボード</h1>
-                      <table>
-                          <thead>
-                              <tr>
-                                  <th>商品名</th>
-                                  <th>在庫数</th>
-                                  <th>最終更新日</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              {% for item in items %}
-                              <tr>
-                                  <td>{{ item['name'] }}</td>
-                                  <td>{{ item['stock'] }}</td>
-                                  <td>{{ item['updated_at'] }}</td>
-                              </tr>
-                              {% endfor %}
-                          </tbody>
-                      </table> 
+                      <h1>📦 在庫管理ダッシュボード</h1>
+                      <div class="cards">
+                          {% for item in items %}
+                          <div class="card">
+                              <h3>{{ item['name'] }}</h3>
+                              <div class="stock">在庫数: {{ item['stock'] }}</div>
+                              <div class="updated">更新日: {{ item['updated_at'] }}</div>
+                          </div>
+                          {% endfor %}
+                      </div>
+
+                      <div class="section">
+                          <h2>📂 Secret ファイルの状態</h2>
+                          <ul>
+                              <li><b>ファイルパス:</b> /vault/secrets/db-creds</li>
+                              <li><b>最終更新日時:</b> {{ updated_str }}</li>
+                              <li><b>TTL 残り秒数:</b> {{ remaining }} 秒</li>
+                              <li><b>DB_USER:</b> {{ creds.get("DB_USER") }}</li>
+                              <li><b>DB_PASSWORD:</b> {{ creds.get("DB_PASSWORD") }}</li>
+                          </ul>
+                      </div>
                   </body>
                   </html>
                   '''
-                  return render_template_string(html_template, items=items)
+                  return render_template_string(html_template, items=items, creds=creds, updated_str=updated_str, remaining=remaining)
 
               @app.route("/transit", methods=["GET", "POST"])
               def transit_demo():
