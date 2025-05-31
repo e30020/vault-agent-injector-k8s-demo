@@ -8,17 +8,17 @@ data:
       id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
       stock INTEGER NOT NULL,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
     );
 
-    INSERT INTO inventory (name, stock) VALUES
-    ('りんご', 100),
-    ('バナナ', 150),
-    ('みかん', 80),
-    ('ぶどう', 200),
-    ('パイナップル', 60),
-    ('もも', 90),
-    ('すいか', 40),
-    ('メロン', 70),
-    ('レモン', 120),
-    ('キウイ', 110);
+    INSERT INTO inventory (name, stock, updated_at) VALUES
+    ('りんご', 100, NOW() - INTERVAL '10 minutes'),
+    ('バナナ', 150, NOW() - INTERVAL '20 minutes'),
+    ('みかん', 80, NOW() - INTERVAL '5 minutes'),
+    ('ぶどう', 200, NOW() - INTERVAL '15 minutes'),
+    ('パイナップル', 60, NOW() - INTERVAL '25 minutes'),
+    ('もも', 90, NOW() - INTERVAL '8 minutes'),
+    ('すいか', 40, NOW() - INTERVAL '30 minutes'),
+    ('メロン', 70, NOW() - INTERVAL '12 minutes'),
+    ('レモン', 120, NOW() - INTERVAL '18 minutes'),
+    ('キウイ', 110, NOW() - INTERVAL '3 minutes');

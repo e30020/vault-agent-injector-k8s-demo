@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -29,13 +28,16 @@ spec:
       containers:
         - args:
             - |
-              pip install flask psycopg2-binary requests pyOpenSSL;
+              pip install flask psycopg2-binary requests pyOpenSSL pytz;
 
               cat <<EOF > app.py
-              from flask import Flask, request, render_template_string
-              import psycopg2, os, time, datetime, requests
+              from flask import Flask, request, render_template_string, redirect
+              import psycopg2, os, time, datetime, requests, pytz 
 
               app = Flask(__name__)
+              is_auto_refresh = True
+              initial_creds = {}
+              initial_loaded_time = ""
 
               def load_env_file(path):
                   creds = {}
@@ -46,15 +48,45 @@ spec:
                               creds[k] = v
                   return creds
 
+              def load_secret(path="/vault/secrets/db-creds"):
+                  if not os.path.exists(path):
+                      return None, "シークレットファイルが見つかりません", None
+                  try:
+                      creds = load_env_file(path)
+                      updated = os.path.getmtime(path)
+                      jst = pytz.timezone("Asia/Tokyo")
+                      updated_str = datetime.datetime.fromtimestamp(updated, tz=jst).strftime('%Y-%m-%d %H:%M:%S')
+                      vault_max_ttl = 30
+                      remaining = max(0, int(vault_max_ttl - (time.time() - updated)))
+                      return creds, updated_str, remaining
+                  except Exception as e:
+                      return None, str(e), None
+
+              @app.route("/toggle", methods=["POST"])
+              def toggle():
+                  global is_auto_refresh
+                  is_auto_refresh = not is_auto_refresh
+                  return redirect("/")
+
               @app.route("/")
               def index():
+                  global is_auto_refresh, initial_creds, initial_loaded_time
+
                   secret_path = "/vault/secrets/db-creds"
-                  if not os.path.exists(secret_path):
-                      return "<h2 style='color:red;'>Vaultのシークレットが見つかりません</h2>"
-                  try:
-                      creds = load_env_file(secret_path)
-                  except Exception as e:
-                      return f"<h2 style='color:red;'>シークレット読み込みエラー: {e}</h2>"
+                  db_error = False
+
+                  jst = pytz.timezone("Asia/Tokyo")
+
+                  if is_auto_refresh:
+                      creds, updated_str, remaining_secs = load_secret(secret_path)
+                      if creds is None:
+                          return error_screen(updated_str)
+                      remaining = f"{remaining_secs} 秒"
+                  else:
+                      if not initial_creds:
+                          initial_creds, initial_loaded_time, _ = load_secret(secret_path)
+                      creds, updated_str, _ = initial_creds, initial_loaded_time, 0
+                      remaining = "Secret期限切れまであと少し・・・"
 
                   try:
                       connection = psycopg2.connect(
@@ -65,69 +97,95 @@ spec:
                       )
                       cursor = connection.cursor()
                       cursor.execute("SELECT name, stock, updated_at FROM inventory")
-                      items = [{"name": r[0], "stock": r[1], "updated_at": r[2]} for r in cursor.fetchall()]
+                      items = [{"name": r[0], "stock": r[1], "updated_at": r[2].astimezone(jst).strftime('%Y-%m-%d %H:%M:%S')} for r in cursor.fetchall()]
                       cursor.close()
                       connection.close()
-                  except Exception as db_err:
-                      return f"<h2 style='color:red;'>DB接続エラー: {db_err}</h2>"
-
-                  try:
-                      updated = os.path.getmtime(secret_path)
-                      updated_str = datetime.datetime.fromtimestamp(updated).strftime('%Y-%m-%d %H:%M:%S')
-                      vault_max_ttl = 30
-                      remaining = max(0, int(vault_max_ttl - (time.time() - updated)))
                   except Exception:
-                      updated_str = "不明"
-                      remaining = "不明"
+                      db_error = True
+                      items = []
 
                   html_template = '''
                   <!DOCTYPE html>
                   <html lang="ja">
                   <head>
                       <meta charset="UTF-8">
-                      <title>在庫管理ダッシュボード</title>
                       <meta http-equiv="refresh" content="3">
-                      <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+                      <title>在庫管理ダッシュボード</title>
                       <style>
-                          body { font-family: 'Roboto', sans-serif; background-color: #f0f2f5; margin: 0; padding: 40px; }
-                          h1 { text-align: center; color: #333; margin-bottom: 30px; }
+                          body { font-family: 'Roboto', sans-serif; background-color: #f0f2f5; padding: 40px; }
                           .cards { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-                          .card { background-color: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; width: 280px; transition: transform 0.2s; }
-                          .card:hover { transform: translateY(-5px); }
-                          .card h3 { margin-top: 0; color: #444; }
-                          .card .stock { font-size: 1.2em; margin: 10px 0; }
-                          .card .updated { color: #888; font-size: 0.9em; }
+                          .card {
+                              background: {{ "white" if not db_error else "#ffe5e5" }};
+                              border-radius: 12px;
+                              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                              padding: 20px;
+                              width: 280px;
+                              border: {{ "none" if not db_error else "2px solid red" }};
+                          }
                           .section { margin-top: 40px; text-align: center; }
-                          .section ul { list-style: none; padding: 0; margin: 0 auto; display: inline-block; text-align: left; }
-                          .section li { background: #fff; margin: 5px 0; padding: 10px 20px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+                          button { font-size: 1em; padding: 10px 20px; margin-bottom: 20px; }
                       </style>
                   </head>
                   <body>
+                      <a href='/transit'>🔁 Transit デモへ</a>
                       <h1>📦 在庫管理ダッシュボード</h1>
+
+                      <div style="text-align: center;">
+                        <form action="/toggle" method="post" style="display: inline-block;">
+                          <button type="submit">自動更新: {{ "ON 🔄" if is_auto_refresh else "OFF ⛔" }}</button>
+                        </form>
+                      </div>
                       <div class="cards">
+                          {% if db_error %}
+                          <div class="card">
+                              <h3 style="color:red;">⚠ 在庫データ取得エラー</h3>
+                              <p>資格情報が無効になっている可能性があります。</p>
+                              <p style="color:#888;">自動更新をONにしてVault Agentにより資格情報を更新してください。</p>
+                          </div>
+                          {% else %}
                           {% for item in items %}
                           <div class="card">
                               <h3>{{ item['name'] }}</h3>
-                              <div class="stock">在庫数: {{ item['stock'] }}</div>
-                              <div class="updated">更新日: {{ item['updated_at'] }}</div>
+                              <div>在庫数: {{ item['stock'] }}</div>
+                              <div>更新日: {{ item['updated_at'] }}</div>
                           </div>
                           {% endfor %}
+                          {% endif %}
                       </div>
-
                       <div class="section">
                           <h2>📂 Secret ファイルの状態</h2>
-                          <ul>
-                              <li><b>ファイルパス:</b> /vault/secrets/db-creds</li>
-                              <li><b>最終更新日時:</b> {{ updated_str }}</li>
-                              <li><b>TTL 残り秒数:</b> {{ remaining }} 秒</li>
-                              <li><b>DB_USER:</b> {{ creds.get("DB_USER") }}</li>
-                              <li><b>DB_PASSWORD:</b> {{ creds.get("DB_PASSWORD") }}</li>
-                          </ul>
+                          <div style="display: flex; justify-content: center;">
+                          <table style="text-align: left;">
+                              <tr><th style="padding: 4px 12px;">ファイルパス</th><td>{{ "/vault/secrets/db-creds" }}</td></tr>
+                              <tr><th style="padding: 4px 12px;">最終更新日時</th><td>{{ updated_str }}</td></tr>
+                              <tr><th style="padding: 4px 12px;">TTL 残り秒数</th><td>{{ remaining }}</td></tr>
+                              <tr><th style="padding: 4px 12px;">DB_USER</th><td>{{ creds.get("DB_USER") }}</td></tr>
+                              <tr><th style="padding: 4px 12px;">DB_PASSWORD</th><td>{{ creds.get("DB_PASSWORD") }}</td></tr>
+                          </table>
+                          </div>
                       </div>
-                  </body>
-                  </html>
+                  </body></html>
                   '''
-                  return render_template_string(html_template, items=items, creds=creds, updated_str=updated_str, remaining=remaining)
+
+                  return render_template_string(html_template,
+                                                items=items,
+                                                creds=creds,
+                                                updated_str=updated_str,
+                                                remaining=remaining,
+                                                is_auto_refresh=is_auto_refresh,
+                                                db_error=db_error)
+
+              def error_screen(message):
+                  return f'''
+                  <html><body style="text-align:center;padding:40px;font-family:sans-serif;">
+                  <h1 style="color:red;">現在、在庫情報を取得できません</h1>
+                  <p>{message}</p>
+                  <p style="color:#888;">自動更新がOFFの場合、一定時間で接続が無効になることがあります。</p>
+                  <form action="/toggle" method="post">
+                      <button type="submit">自動更新をONにする</button>
+                  </form>
+                  </body></html>
+                  '''
 
               @app.route("/transit", methods=["GET", "POST"])
               def transit_demo():
@@ -166,23 +224,42 @@ spec:
 
                   return f"""
                   <html>
+                  <head>
+                    <style>
+                      body {{ font-family: Arial; }}
+                      .container {{ display: flex; gap: 40px; }}
+                      .box {{ flex: 1; border: 1px solid #ccc; padding: 20px; }}
+                      input, textarea {{ width: 100%; margin-top: 8px; }}
+                      textarea {{ height: 100px; }}
+                    </style>
+                  </head>
                   <body>
                     <h2>🔐 Vault Transit Engine Demo</h2>
                     <a href="/">⬅ DB Secret デモへ戻る</a>
-                    <form method="post">
-                      <input type="hidden" name="mode" value="encrypt" />
-                      <label>平文:</label><br>
-                      <input name="encrypt_input" value="{encrypt_input}" /><br><br>
-                      <button type="submit">🔒 暗号化</button>
-                    </form>
-                    <pre>{ciphertext}</pre>
-                    <form method="post">
-                      <input type="hidden" name="mode" value="decrypt" />
-                      <label>暗号文:</label><br>
-                      <textarea name="decrypt_input">{decrypt_input}</textarea><br>
-                      <button type="submit">🔓 復号化</button>
-                    </form>
-                    <pre>{plaintext}</pre>
+                    <div class="container">
+                      <div class="box">
+                        <h3>📝 暗号化</h3>
+                        <form method="post">
+                          <input type="hidden" name="mode" value="encrypt" />
+                          <label>平文:</label><br>
+                          <input name="encrypt_input" value="{encrypt_input}" /><br><br>
+                          <button type="submit">🔒 暗号化</button>
+                        </form>
+                        {"<h4>暗号化結果:</h4><textarea readonly>" + ciphertext + "</textarea>" if ciphertext else ""}
+                        {"<h4>curl:</h4><textarea readonly>" + encrypt_curl + "</textarea>" if encrypt_curl else ""}
+                      </div>
+                      <div class="box">
+                        <h3>🔓 復号化</h3>
+                        <form method="post">
+                          <input type="hidden" name="mode" value="decrypt" />
+                          <label>暗号文:</label><br>
+                          <textarea name="decrypt_input">{decrypt_input}</textarea><br>
+                          <button type="submit">🔓 復号化</button>
+                        </form>
+                        {"<h4>復号結果:</h4><textarea readonly>" + plaintext + "</textarea>" if plaintext else ""}
+                        {"<h4>curl:</h4><textarea readonly>" + decrypt_curl + "</textarea>" if decrypt_curl else ""}
+                      </div>
+                    </div>
                   </body>
                   </html>
                   """
