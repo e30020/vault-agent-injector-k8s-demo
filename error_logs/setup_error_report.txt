@@ -1,209 +1,40 @@
 ======= [Vault Helm Release Status] =======
 NAME 	NAMESPACE	REVISION	UPDATED                                	STATUS  	CHART       	APP VERSION
-vault	default  	1       	2025-05-31 08:54:13.823302329 +0900 JST	deployed	vault-0.30.0	1.19.0     
+vault	default  	1       	2025-07-03 18:44:36.822817062 +0900 JST	deployed	vault-0.30.0	1.19.0     
 ======= [Vault Pods] =======
-NAME                                    READY   STATUS      RESTARTS       AGE    IP            NODE       NOMINATED NODE   READINESS GATES
-demo-app-64dc955864-6bw7s               0/2     Init:0/1    0              117s   10.244.3.28   minikube   <none>           <none>
-nginx-tls-5b74c74f46-dq4rm              2/2     Running     2 (107s ago)   116s   10.244.3.29   minikube   <none>           <none>
-postgres-b85d56587-lbhnh                1/1     Running     0              118s   10.244.3.25   minikube   <none>           <none>
-postgres-init-t2828                     0/1     Completed   2              118s   10.244.3.27   minikube   <none>           <none>
-vault-0                                 1/1     Running     0              2m7s   10.244.3.24   minikube   <none>           <none>
-vault-agent-injector-75f9dfc9c8-4jthz   1/1     Running     0              2m7s   10.244.3.23   minikube   <none>           <none>
-vault-init-jjcl5                        0/1     Completed   1              118s   10.244.3.26   minikube   <none>           <none>
+NAME                                    READY   STATUS             RESTARTS      AGE     IP             NODE       NOMINATED NODE   READINESS GATES
+demo-app-5bbb7454c4-vggzf               0/2     Init:0/1           0             2m6s    10.244.1.130   minikube   <none>           <none>
+nginx-tls-5b74c74f46-rd5ss              1/2     CrashLoopBackOff   4 (7s ago)    2m5s    10.244.1.131   minikube   <none>           <none>
+postgres-b85d56587-t9czm                1/1     Running            0             2m11s   10.244.1.127   minikube   <none>           <none>
+postgres-init-p4jfq                     0/1     Completed          2             2m8s    10.244.1.129   minikube   <none>           <none>
+vault-0                                 0/1     CrashLoopBackOff   4 (33s ago)   2m24s   10.244.1.126   minikube   <none>           <none>
+vault-agent-injector-75f9dfc9c8-pmwrk   1/1     Running            0             2m24s   10.244.1.125   minikube   <none>           <none>
+vault-init-7d7lx                        0/1     CrashLoopBackOff   4 (26s ago)   2m10s   10.244.1.128   minikube   <none>           <none>
 ======= [Vault Injector Logs] =======
-2025-05-30T23:54:15.264Z [INFO]  handler.auto-tls: Generated CA
-2025-05-30T23:54:15.268Z [INFO]  handler: Starting handler..
+2025-07-03T09:44:41.802Z [INFO]  handler.auto-tls: Generated CA
+2025-07-03T09:44:41.876Z [INFO]  handler: Starting handler..
 Listening on ":8080"...
-2025-05-30T23:54:15.363Z [INFO]  handler.certwatcher: Updated certificate bundle received. Updating certs...
-2025-05-30T23:54:23.544Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
-2025-05-30T23:54:23.719Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
-2025-05-30T23:54:23.895Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
-2025-05-30T23:54:24.390Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
-2025-05-30T23:54:25.160Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
+2025-07-03T09:44:41.896Z [INFO]  handler.certwatcher: Updated certificate bundle received. Updating certs...
+2025-07-03T09:44:51.716Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
+2025-07-03T09:44:52.951Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
+2025-07-03T09:44:54.085Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
+2025-07-03T09:44:56.401Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
+2025-07-03T09:44:57.722Z [INFO]  handler: Request received: Method=POST URL=/mutate?timeout=30s
 ======= [Vault Init Job Logs] =======
-Error enabling kubernetes auth: Error making API request.
-
-URL: POST http://vault.default.svc:8200/v1/sys/auth/kubernetes
-Code: 400. Errors:
-
-* path is already in use at kubernetes/
-Success! Data written to: auth/kubernetes/config
-Success! Uploaded policy: myapp-policy
-Success! Data written to: auth/kubernetes/role/myapp-role
-Success! Uploaded policy: nginx-policy
-Success! Data written to: auth/kubernetes/role/nginx-role
-Error enabling: Error making API request.
-
-URL: POST http://vault.default.svc:8200/v1/sys/mounts/database
-Code: 400. Errors:
-
-* path is already in use at database/
-Success! Data written to: database/config/my-postgres-db
-Success! Data written to: database/roles/readonly-role
-Success! Enabled the transit secrets engine at: transit/
-Key                       Value
----                       -----
-allow_plaintext_backup    false
-auto_rotate_period        0s
-deletion_allowed          false
-derived                   false
-exportable                false
-imported_key              false
-keys                      map[1:1748649276]
-latest_version            1
-min_available_version     0
-min_decryption_version    1
-min_encryption_version    0
-name                      my-transit-key
-supports_decryption       true
-supports_derivation       true
-supports_encryption       true
-supports_signing          false
-type                      aes256-gcm96
-Enable Root PKI
-Success! Enabled the pki secrets engine at: pki-root/
-WARNING! The following warnings were returned from Vault:
-
-  * This mount hasn't configured any authority information access (AIA)
-  fields; this may make it harder for systems to find missing certificates
-  in the chain or to validate revocation status of certificates. Consider
-  updating /config/urls or the newly generated issuer with this information.
-
-Key              Value
----              -----
-certificate      -----BEGIN CERTIFICATE-----
-MIIDFTCCAf2gAwIBAgIUJYWfxiMl4u+gWT7KLdfGfY2J+WEwDQYJKoZIhvcNAQEL
-BQAwEjEQMA4GA1UEAxMHUm9vdCBDQTAeFw0yNTA1MzAyMzU0MDdaFw0yNTA3MDEy
-MzU0MzZaMBIxEDAOBgNVBAMTB1Jvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IB
-DwAwggEKAoIBAQCcDub03IBtn3q1cQiq+3iOAR2s0HZUmFEGR+a8kVOd/5TkWaCg
-g0V1va8mqdZ77EGvRT39RU+qJj7gJpzNubCp9HcMoIiPXtqBaUk++mr1mE/Akxk8
-7DH8o7JBicHEvqWMURt4csey2W7dxBXO2w1Ki1dfhVV17mjd1xwEWqLZOgtZu5Gh
-BVZl8Pw6e0JJMCy4FNh3VFkYrmfPJL7XojT/AkQFGSeBjPvReLS3Va1tvTougaoC
-nAK3VQHtsQfc2+cRiNdDW4DJyVcyuuxqGrMOaIX51Zc/T0zctIDjUt9ycUfsK7I9
-RlSlNj1FjqBaIIqskHVcnUOBCsvEuCTXjjvjAgMBAAGjYzBhMA4GA1UdDwEB/wQE
-AwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQvkvGmD6bAICbMXUS0DdKq
-/+78+jAfBgNVHSMEGDAWgBQvkvGmD6bAICbMXUS0DdKq/+78+jANBgkqhkiG9w0B
-AQsFAAOCAQEAfkMJSCFPc3OKXM8Xr977wzBgqI4JAKojTTxV0gXSbNTqzWi0EaqP
-Q958GXi0AuGVPX/V+MQ8QVrnkBI3YDAkpe0hzD7Yv/iYy0Kr4bM4LQ9Rf+U8LBLI
-Ee4LPwlygdfMCSdHXFmoxB9tYhdalD15D7QTslTbWq7bIkqwpMepvIByaxe1dnTW
-YLLoEbNxrGv4DRr7SNT8fVwJ3uje8Yb1GxwmJ7wm85NafcjWyuAJoGLiyEbZp1hV
-UqANCah4qFBLn+GN7wL0zLUfJa7K/cDQquDjb2ayKpmhvPGjhwQzobV3J82qcfu1
-o20Z7dRzy8w4bGqTP6pQMIpwB7UMvKQ/qw==
------END CERTIFICATE-----
-expiration       1751414076
-issuer_id        f32d4f31-526c-aafc-834e-9342bf45b783
-issuer_name      n/a
-issuing_ca       -----BEGIN CERTIFICATE-----
-MIIDFTCCAf2gAwIBAgIUJYWfxiMl4u+gWT7KLdfGfY2J+WEwDQYJKoZIhvcNAQEL
-BQAwEjEQMA4GA1UEAxMHUm9vdCBDQTAeFw0yNTA1MzAyMzU0MDdaFw0yNTA3MDEy
-MzU0MzZaMBIxEDAOBgNVBAMTB1Jvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IB
-DwAwggEKAoIBAQCcDub03IBtn3q1cQiq+3iOAR2s0HZUmFEGR+a8kVOd/5TkWaCg
-g0V1va8mqdZ77EGvRT39RU+qJj7gJpzNubCp9HcMoIiPXtqBaUk++mr1mE/Akxk8
-7DH8o7JBicHEvqWMURt4csey2W7dxBXO2w1Ki1dfhVV17mjd1xwEWqLZOgtZu5Gh
-BVZl8Pw6e0JJMCy4FNh3VFkYrmfPJL7XojT/AkQFGSeBjPvReLS3Va1tvTougaoC
-nAK3VQHtsQfc2+cRiNdDW4DJyVcyuuxqGrMOaIX51Zc/T0zctIDjUt9ycUfsK7I9
-RlSlNj1FjqBaIIqskHVcnUOBCsvEuCTXjjvjAgMBAAGjYzBhMA4GA1UdDwEB/wQE
-AwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQvkvGmD6bAICbMXUS0DdKq
-/+78+jAfBgNVHSMEGDAWgBQvkvGmD6bAICbMXUS0DdKq/+78+jANBgkqhkiG9w0B
-AQsFAAOCAQEAfkMJSCFPc3OKXM8Xr977wzBgqI4JAKojTTxV0gXSbNTqzWi0EaqP
-Q958GXi0AuGVPX/V+MQ8QVrnkBI3YDAkpe0hzD7Yv/iYy0Kr4bM4LQ9Rf+U8LBLI
-Ee4LPwlygdfMCSdHXFmoxB9tYhdalD15D7QTslTbWq7bIkqwpMepvIByaxe1dnTW
-YLLoEbNxrGv4DRr7SNT8fVwJ3uje8Yb1GxwmJ7wm85NafcjWyuAJoGLiyEbZp1hV
-UqANCah4qFBLn+GN7wL0zLUfJa7K/cDQquDjb2ayKpmhvPGjhwQzobV3J82qcfu1
-o20Z7dRzy8w4bGqTP6pQMIpwB7UMvKQ/qw==
------END CERTIFICATE-----
-key_id           052bec32-b0a1-5e12-a06e-c21ba1c0e1fa
-key_name         n/a
-serial_number    25:85:9f:c6:23:25:e2:ef:a0:59:3e:ca:2d:d7:c6:7d:8d:89:f9:61
-Enable Intermediate PKI
-Success! Enabled the pki secrets engine at: pki-int/
-Sign Intermediate CSR with Root
-Set signed intermediate certificate
-Key                 Value
----                 -----
-existing_issuers    <nil>
-existing_keys       <nil>
-imported_issuers    [bcdf449d-33dd-04df-ad5e-2944b646a7d1 4c93ed92-e259-ed24-77be-426844042759]
-imported_keys       <nil>
-mapping             map[4c93ed92-e259-ed24-77be-426844042759: bcdf449d-33dd-04df-ad5e-2944b646a7d1:1dccac95-9039-6039-66fe-4084c8a11c5d]
-WARNING! The following warnings were returned from Vault:
-
-  * This mount hasn't configured any authority information access (AIA)
-  fields; this may make it harder for systems to find missing certificates
-  in the chain or to validate revocation status of certificates. Consider
-  updating /config/urls or the newly generated issuer with this information.
-
-Set issuing/CRL URLs
-Key                        Value
----                        -----
-crl_distribution_points    [http://vault.default.svc:8200/v1/pki-int/crl]
-enable_templating          false
-issuing_certificates       [http://vault.default.svc:8200/v1/pki-int/ca]
-ocsp_servers               []
-Create Role
-Key                                   Value
----                                   -----
-allow_any_name                        false
-allow_bare_domains                    true
-allow_glob_domains                    false
-allow_ip_sans                         true
-allow_localhost                       true
-allow_subdomains                      true
-allow_token_displayname               false
-allow_wildcard_certificates           true
-allowed_domains                       [nginx.example.com]
-allowed_domains_template              false
-allowed_other_sans                    []
-allowed_serial_numbers                []
-allowed_uri_sans                      []
-allowed_uri_sans_template             false
-allowed_user_ids                      []
-basic_constraints_valid_for_non_ca    false
-client_flag                           true
-cn_validations                        [email hostname]
-code_signing_flag                     false
-country                               []
-email_protection_flag                 false
-enforce_hostnames                     true
-ext_key_usage                         []
-ext_key_usage_oids                    []
-generate_lease                        false
-issuer_ref                            default
-key_bits                              2048
-key_type                              rsa
-key_usage                             [DigitalSignature KeyAgreement KeyEncipherment]
-locality                              []
-max_ttl                               72h
-no_store                              false
-not_after                             n/a
-not_before_duration                   30s
-organization                          []
-ou                                    []
-policy_identifiers                    []
-postal_code                           []
-province                              []
-require_cn                            true
-serial_number_source                  json-csr
-server_flag                           true
-signature_bits                        256
-street_address                        []
-ttl                                   0s
-use_csr_common_name                   true
-use_csr_sans                          true
-use_pss                               false
-Vault PKI Init Complete
+Error enabling kubernetes auth: Post "http://vault.default.svc:8200/v1/sys/auth/kubernetes": dial tcp 10.111.236.29:8200: connect: connection refused
+Error writing data to auth/kubernetes/config: Put "http://vault.default.svc:8200/v1/auth/kubernetes/config": dial tcp 10.111.236.29:8200: connect: connection refused
 ======= [App Logs] =======
-Error from server (BadRequest): container "app" in pod "demo-app-64dc955864-6bw7s" is waiting to start: PodInitializing
+Error from server (BadRequest): container "app" in pod "demo-app-5bbb7454c4-vggzf" is waiting to start: PodInitializing
 app logs failed
 ======= [Describe All Resources] =======
-Name:             demo-app-64dc955864-6bw7s
+Name:             demo-app-5bbb7454c4-vggzf
 Namespace:        default
 Priority:         0
 Service Account:  vault
 Node:             minikube/192.168.49.2
-Start Time:       Sat, 31 May 2025 08:54:24 +0900
+Start Time:       Thu, 03 Jul 2025 18:44:57 +0900
 Labels:           app=demo-app
-                  pod-template-hash=64dc955864
+                  pod-template-hash=5bbb7454c4
 Annotations:      vault.hashicorp.com/agent-init-first: true
                   vault.hashicorp.com/agent-inject: true
                   vault.hashicorp.com/agent-inject-secret-db-creds: database/creds/readonly-role
@@ -216,13 +47,13 @@ Annotations:      vault.hashicorp.com/agent-init-first: true
                   vault.hashicorp.com/agent-pre-populate: true
                   vault.hashicorp.com/role: myapp-role
 Status:           Pending
-IP:               10.244.3.28
+IP:               10.244.1.130
 IPs:
-  IP:           10.244.3.28
-Controlled By:  ReplicaSet/demo-app-64dc955864
+  IP:           10.244.1.130
+Controlled By:  ReplicaSet/demo-app-5bbb7454c4
 Init Containers:
   vault-agent-init:
-    Container ID:  docker://911dfc080fd420447356e294f5347f37a8cd88e4bdd0c1d6831794c0cc3401f3
+    Container ID:  docker://1bf111c0126c70e3ed14f103600e76164144d03cf2a330083d5eb8afa9f0bac5
     Image:         hashicorp/vault:1.19.0
     Image ID:      docker-pullable://hashicorp/vault@sha256:bbb7f98dc67d9ebdda1256de288df1cb9a5450990e48338043690bee3b332c90
     Port:          <none>
@@ -233,7 +64,7 @@ Init Containers:
     Args:
       echo ${VAULT_CONFIG?} | base64 -d > /home/vault/config.json && vault agent -config=/home/vault/config.json
     State:          Running
-      Started:      Sat, 31 May 2025 08:54:30 +0900
+      Started:      Thu, 03 Jul 2025 18:45:09 +0900
     Ready:          False
     Restart Count:  0
     Limits:
@@ -251,7 +82,7 @@ Init Containers:
       VAULT_CONFIG:      eyJhdXRvX2F1dGgiOnsibWV0aG9kIjp7InR5cGUiOiJrdWJlcm5ldGVzIiwibW91bnRfcGF0aCI6ImF1dGgva3ViZXJuZXRlcyIsImNvbmZpZyI6eyJyb2xlIjoibXlhcHAtcm9sZSIsInRva2VuX3BhdGgiOiIvdmFyL3J1bi9zZWNyZXRzL2t1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvdG9rZW4ifX0sInNpbmsiOlt7InR5cGUiOiJmaWxlIiwiY29uZmlnIjp7InBhdGgiOiIvaG9tZS92YXVsdC8udmF1bHQtdG9rZW4ifX1dfSwiZXhpdF9hZnRlcl9hdXRoIjp0cnVlLCJwaWRfZmlsZSI6Ii9ob21lL3ZhdWx0Ly5waWQiLCJ2YXVsdCI6eyJhZGRyZXNzIjoiaHR0cDovL3ZhdWx0LmRlZmF1bHQuc3ZjOjgyMDAifSwidGVtcGxhdGUiOlt7ImRlc3RpbmF0aW9uIjoiL3ZhdWx0L3NlY3JldHMvZGItY3JlZHMiLCJjb250ZW50cyI6Int7LSB3aXRoIHNlY3JldCBcImRhdGFiYXNlL2NyZWRzL3JlYWRvbmx5LXJvbGVcIiAtfX1cbkRCX1VTRVI9e3sgLkRhdGEudXNlcm5hbWUgfX1cbkRCX1BBU1NXT1JEPXt7IC5EYXRhLnBhc3N3b3JkIH19XG57ey0gZW5kIH19XG4iLCJsZWZ0X2RlbGltaXRlciI6Int7IiwicmlnaHRfZGVsaW1pdGVyIjoifX0ifV0sInRlbXBsYXRlX2NvbmZpZyI6eyJleGl0X29uX3JldHJ5X2ZhaWx1cmUiOnRydWV9fQ==
     Mounts:
       /home/vault from home-init (rw)
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-l7hqq (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-2fkgp (ro)
       /vault/secrets from vault-secrets (rw)
 Containers:
   app:
@@ -264,13 +95,16 @@ Containers:
       /bin/sh
       -c
     Args:
-      pip install flask psycopg2-binary requests pyOpenSSL;
+      pip install flask psycopg2-binary requests pyOpenSSL pytz;
       
       cat <<EOF > app.py
-      from flask import Flask, request, render_template_string
-      import psycopg2, os, time, datetime, requests
+      from flask import Flask, request, render_template_string, redirect
+      import psycopg2, os, time, datetime, requests, pytz 
       
       app = Flask(__name__)
+      is_auto_refresh = True
+      initial_creds = {}
+      initial_loaded_time = ""
       
       def load_env_file(path):
           creds = {}
@@ -281,15 +115,45 @@ Containers:
                       creds[k] = v
           return creds
       
+      def load_secret(path="/vault/secrets/db-creds"):
+          if not os.path.exists(path):
+              return None, "シークレットファイルが見つかりません", None
+          try:
+              creds = load_env_file(path)
+              updated = os.path.getmtime(path)
+              jst = pytz.timezone("Asia/Tokyo")
+              updated_str = datetime.datetime.fromtimestamp(updated, tz=jst).strftime('%Y-%m-%d %H:%M:%S')
+              vault_max_ttl = 30
+              remaining = max(0, int(vault_max_ttl - (time.time() - updated)))
+              return creds, updated_str, remaining
+          except Exception as e:
+              return None, str(e), None
+      
+      @app.route("/toggle", methods=["POST"])
+      def toggle():
+          global is_auto_refresh
+          is_auto_refresh = not is_auto_refresh
+          return redirect("/")
+      
       @app.route("/")
       def index():
+          global is_auto_refresh, initial_creds, initial_loaded_time
+      
           secret_path = "/vault/secrets/db-creds"
-          if not os.path.exists(secret_path):
-              return "<h2 style='color:red;'>Vaultのシークレットが見つかりません</h2>"
-          try:
-              creds = load_env_file(secret_path)
-          except Exception as e:
-              return f"<h2 style='color:red;'>シークレット読み込みエラー: {e}</h2>"
+          db_error = False
+      
+          jst = pytz.timezone("Asia/Tokyo")
+      
+          if is_auto_refresh:
+              creds, updated_str, remaining_secs = load_secret(secret_path)
+              if creds is None:
+                  return error_screen(updated_str)
+              remaining = f"{remaining_secs} 秒"
+          else:
+              if not initial_creds:
+                  initial_creds, initial_loaded_time, _ = load_secret(secret_path)
+              creds, updated_str, _ = initial_creds, initial_loaded_time, 0
+              remaining = "Secret期限切れまであと少し・・・"
       
           try:
               connection = psycopg2.connect(
@@ -300,51 +164,96 @@ Containers:
               )
               cursor = connection.cursor()
               cursor.execute("SELECT name, stock, updated_at FROM inventory")
-              items = [{"name": r[0], "stock": r[1], "updated_at": r[2]} for r in cursor.fetchall()]
+              items = [{"name": r[0], "stock": r[1], "updated_at": r[2].astimezone(jst).strftime('%Y-%m-%d %H:%M:%S')} for r in cursor.fetchall()]
               cursor.close()
               connection.close()
-          except Exception as db_err:
-              return f"<h2 style='color:red;'>DB接続エラー: {db_err}</h2>"
+          except Exception:
+              db_error = True
+              items = []
       
           html_template = '''
           <!DOCTYPE html>
           <html lang="ja">
           <head>
               <meta charset="UTF-8">
-              <title>在庫管理システム</title>
+              <meta http-equiv="refresh" content="3">
+              <title>在庫管理ダッシュボード</title>
               <style>
-                  body { font-family: sans-serif; margin: 40px; background-color: #f9f9f9; }
-                  h1 { color: #333; }
-                  table { width: 80%; border-collapse: collapse; margin-top: 20px; }
-                  th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
-                  th { background-color: #f0f0f0; }
-                  tr:nth-child(even) { background-color: #fdfdfd; }
+                  body { font-family: 'Roboto', sans-serif; background-color: #f0f2f5; padding: 40px; }
+                  .cards { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+                  .card {
+                      background: {{ "white" if not db_error else "#ffe5e5" }};
+                      border-radius: 12px;
+                      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                      padding: 20px;
+                      width: 280px;
+                      border: {{ "none" if not db_error else "2px solid red" }};
+                  }
+                  .section { margin-top: 40px; text-align: center; }
+                  button { font-size: 1em; padding: 10px 20px; margin-bottom: 20px; }
               </style>
           </head>
           <body>
-              <h1>在庫管理ダッシュボード</h1>
-              <table>
-                  <thead>
-                      <tr>
-                          <th>商品名</th>
-                          <th>在庫数</th>
-                          <th>最終更新日</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      {% for item in items %}
-                      <tr>
-                          <td>{{ item['name'] }}</td>
-                          <td>{{ item['stock'] }}</td>
-                          <td>{{ item['updated_at'] }}</td>
-                      </tr>
-                      {% endfor %}
-                  </tbody>
-              </table>
-          </body>
-          </html>
+              <a href='/transit'>🔁 Transit デモへ</a>
+              <a href='/transform'>🔣 Transform デモへ</a>
+              <h1>📦 在庫管理ダッシュボード</h1>
+      
+              <div style="text-align: center;">
+                <form action="/toggle" method="post" style="display: inline-block;">
+                  <button type="submit">自動更新: {{ "ON 🔄" if is_auto_refresh else "OFF ⛔" }}</button>
+                </form>
+              </div>
+              <div class="cards">
+                  {% if db_error %}
+                  <div class="card">
+                      <h3 style="color:red;">⚠ 在庫データ取得エラー</h3>
+                      <p>資格情報が無効になっている可能性があります。</p>
+                      <p style="color:#888;">自動更新をONにしてVault Agentにより資格情報を更新してください。</p>
+                  </div>
+                  {% else %}
+                  {% for item in items %}
+                  <div class="card">
+                      <h3>{{ item['name'] }}</h3>
+                      <div>在庫数: {{ item['stock'] }}</div>
+                      <div>更新日: {{ item['updated_at'] }}</div>
+                  </div>
+                  {% endfor %}
+                  {% endif %}
+              </div>
+              <div class="section">
+                  <h2>📂 Secret ファイルの状態</h2>
+                  <div style="display: flex; justify-content: center;">
+                  <table style="text-align: left;">
+                      <tr><th style="padding: 4px 12px;">ファイルパス</th><td>{{ "/vault/secrets/db-creds" }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">最終更新日時</th><td>{{ updated_str }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">TTL 残り秒数</th><td>{{ remaining }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">DB_USER</th><td>{{ creds.get("DB_USER") }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">DB_PASSWORD</th><td>{{ creds.get("DB_PASSWORD") }}</td></tr>
+                  </table>
+                  </div>
+              </div>
+          </body></html>
           '''
-          return render_template_string(html_template, items=items)
+      
+          return render_template_string(html_template,
+                                        items=items,
+                                        creds=creds,
+                                        updated_str=updated_str,
+                                        remaining=remaining,
+                                        is_auto_refresh=is_auto_refresh,
+                                        db_error=db_error)
+      
+      def error_screen(message):
+          return f'''
+          <html><body style="text-align:center;padding:40px;font-family:sans-serif;">
+          <h1 style="color:red;">現在、在庫情報を取得できません</h1>
+          <p>{message}</p>
+          <p style="color:#888;">自動更新がOFFの場合、一定時間で接続が無効になることがあります。</p>
+          <form action="/toggle" method="post">
+              <button type="submit">自動更新をONにする</button>
+          </form>
+          </body></html>
+          '''
       
       @app.route("/transit", methods=["GET", "POST"])
       def transit_demo():
@@ -383,26 +292,117 @@ Containers:
       
           return f"""
           <html>
+          <head>
+            <style>
+              body {{ font-family: Arial; }}
+              .container {{ display: flex; gap: 40px; }}
+              .box {{ flex: 1; border: 1px solid #ccc; padding: 20px; }}
+              input, textarea {{ width: 100%; margin-top: 8px; }}
+              textarea {{ height: 100px; }}
+            </style>
+          </head>
           <body>
             <h2>🔐 Vault Transit Engine Demo</h2>
             <a href="/">⬅ DB Secret デモへ戻る</a>
-            <form method="post">
-              <input type="hidden" name="mode" value="encrypt" />
-              <label>平文:</label><br>
-              <input name="encrypt_input" value="{encrypt_input}" /><br><br>
-              <button type="submit">🔒 暗号化</button>
-            </form>
-            <pre>{ciphertext}</pre>
-            <form method="post">
-              <input type="hidden" name="mode" value="decrypt" />
-              <label>暗号文:</label><br>
-              <textarea name="decrypt_input">{decrypt_input}</textarea><br>
-              <button type="submit">🔓 復号化</button>
-            </form>
-            <pre>{plaintext}</pre>
+            <div class="container">
+              <div class="box">
+                <h3>📝 暗号化</h3>
+                <form method="post">
+                  <input type="hidden" name="mode" value="encrypt" />
+                  <label>平文:</label><br>
+                  <input name="encrypt_input" value="{encrypt_input}" /><br><br>
+                  <button type="submit">🔒 暗号化</button>
+                </form>
+                {"<h4>暗号化結果:</h4><textarea readonly>" + ciphertext + "</textarea>" if ciphertext else ""}
+                {"<h4>curl:</h4><textarea readonly>" + encrypt_curl + "</textarea>" if encrypt_curl else ""}
+              </div>
+              <div class="box">
+                <h3>🔓 復号化</h3>
+                <form method="post">
+                  <input type="hidden" name="mode" value="decrypt" />
+                  <label>暗号文:</label><br>
+                  <textarea name="decrypt_input">{decrypt_input}</textarea><br>
+                  <button type="submit">🔓 復号化</button>
+                </form>
+                {"<h4>復号結果:</h4><textarea readonly>" + plaintext + "</textarea>" if plaintext else ""}
+                {"<h4>curl:</h4><textarea readonly>" + decrypt_curl + "</textarea>" if decrypt_curl else ""}
+              </div>
+            </div>
           </body>
           </html>
-          """
+         """
+      
+      @app.route("/transform", methods=["GET", "POST"])
+      def transform_demo():
+        VAULT_ADDR = "http://vault:8200"
+        VAULT_TOKEN = "root"
+        input_value = ""
+        fpe_result = token_result = mask_result = ""
+        fpe_curl = token_curl = mask_curl = ""
+      
+        if request.method == "POST":
+          input_value = request.form["input_value"]
+          role_map = {
+            "fpe": ("fpe-pan-transform", "fpe-pan-role"),
+            "token": ("token-ccn", "token-ccn-role"),
+            "mask": ("mask-pan", "mask-pan-role"),
+          }
+      
+          for ttype in ["fpe", "token", "mask"]:
+            tpl, role = role_map[ttype]
+            res = requests.post(
+              f"{VAULT_ADDR}/v1/transform/encode/{role}",
+              headers={"X-Vault-Token": VAULT_TOKEN},
+              json={"value": input_value, "role": role}
+            ).json()
+            result = res.get("data", {}).get("encoded_value", "")
+            curl = f"""curl -s -H 'X-Vault-Token: {VAULT_TOKEN}' -d '{{"value":"{input_value}","role":"{role}"}}' {VAULT_ADDR}/v1/transform/encode/{role}"""
+            if ttype == "fpe":
+              fpe_result, fpe_curl = result, curl
+            elif ttype == "token":
+              token_result, token_curl = result, curl
+            elif ttype == "mask":
+              mask_result, mask_curl = result, curl
+        return f"""
+        <html>
+        <head>
+        <style>
+          body {{ font-family: Arial; }}
+          .container {{ display: flex; gap: 30px; flex-wrap: wrap; }}
+          .box {{ flex: 1; border: 1px solid #ccc; padding: 20px; min-width: 300px; }}
+          input, textarea {{ width: 100%; margin-top: 8px; }}
+          textarea {{ height: 80px; }}
+        </style>
+        </head>
+        <body>
+        <h2>🔣 Vault Transform Engine Demo</h2>
+        <a href="/">⬅ 戻る</a> |
+        <a href="/transit">🔁 Transit デモへ</a>
+        <form method="post">
+          <label>変換対象データ:</label><br>
+          <input name="input_value" value="{input_value}" /><br><br>
+          <button type="submit">🚀 変換を実行</button>
+        </form>
+        <div class="container">
+          <div class="box">
+          <h3>🔐 FPE (例: クレジットカード番号)</h3>
+          {"<textarea readonly>" + fpe_result + "</textarea>" if fpe_result else ""}
+          {"<h4>curl:</h4><textarea readonly>" + fpe_curl + "</textarea>" if fpe_curl else ""}
+          </div>
+          <div class="box">
+          <h3>🔁 Tokenization (例: マイナンバー)</h3>
+          {"<textarea readonly>" + token_result + "</textarea>" if token_result else ""}
+          {"<h4>curl:</h4><textarea readonly>" + token_curl + "</textarea>" if token_curl else ""}
+          </div>
+          <div class="box">
+          <h3>🔍 Masking 表示</h3>
+          {"<textarea readonly>" + mask_result + "</textarea>" if mask_result else ""}
+          {"<h4>curl:</h4><textarea readonly>" + mask_curl + "</textarea>" if mask_curl else ""}
+          </div>
+        </div>
+        </body>
+        </html>
+        """
       
       if __name__ == "__main__":
           app.run(host="0.0.0.0", port=5000)
@@ -417,7 +417,7 @@ Containers:
     Environment:    <none>
     Mounts:
       /etc/tls from tls-certs (ro)
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-l7hqq (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-2fkgp (ro)
       /vault/secrets from vault-secrets (rw)
   vault-agent:
     Container ID:  
@@ -449,7 +449,7 @@ Containers:
       VAULT_CONFIG:      eyJhdXRvX2F1dGgiOnsibWV0aG9kIjp7InR5cGUiOiJrdWJlcm5ldGVzIiwibW91bnRfcGF0aCI6ImF1dGgva3ViZXJuZXRlcyIsImNvbmZpZyI6eyJyb2xlIjoibXlhcHAtcm9sZSIsInRva2VuX3BhdGgiOiIvdmFyL3J1bi9zZWNyZXRzL2t1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvdG9rZW4ifX0sInNpbmsiOlt7InR5cGUiOiJmaWxlIiwiY29uZmlnIjp7InBhdGgiOiIvaG9tZS92YXVsdC8udmF1bHQtdG9rZW4ifX1dfSwiZXhpdF9hZnRlcl9hdXRoIjpmYWxzZSwicGlkX2ZpbGUiOiIvaG9tZS92YXVsdC8ucGlkIiwidmF1bHQiOnsiYWRkcmVzcyI6Imh0dHA6Ly92YXVsdC5kZWZhdWx0LnN2Yzo4MjAwIn0sInRlbXBsYXRlIjpbeyJkZXN0aW5hdGlvbiI6Ii92YXVsdC9zZWNyZXRzL2RiLWNyZWRzIiwiY29udGVudHMiOiJ7ey0gd2l0aCBzZWNyZXQgXCJkYXRhYmFzZS9jcmVkcy9yZWFkb25seS1yb2xlXCIgLX19XG5EQl9VU0VSPXt7IC5EYXRhLnVzZXJuYW1lIH19XG5EQl9QQVNTV09SRD17eyAuRGF0YS5wYXNzd29yZCB9fVxue3stIGVuZCB9fVxuIiwibGVmdF9kZWxpbWl0ZXIiOiJ7eyIsInJpZ2h0X2RlbGltaXRlciI6In19In1dLCJ0ZW1wbGF0ZV9jb25maWciOnsiZXhpdF9vbl9yZXRyeV9mYWlsdXJlIjp0cnVlfX0=
     Mounts:
       /home/vault from home-sidecar (rw)
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-l7hqq (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-2fkgp (ro)
       /vault/secrets from vault-secrets (rw)
 Conditions:
   Type                        Status
@@ -463,11 +463,11 @@ Volumes:
     Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
     Medium:     
     SizeLimit:  <unset>
-  kube-api-access-l7hqq:
+  kube-api-access-2fkgp:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
-    ConfigMapOptional:       <nil>
+    Optional:                false
     DownwardAPI:             true
   home-init:
     Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
@@ -486,51 +486,51 @@ Node-Selectors:  <none>
 Tolerations:     node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
                  node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
 Events:
-  Type    Reason     Age   From               Message
-  ----    ------     ----  ----               -------
-  Normal  Scheduled  117s  default-scheduler  Successfully assigned default/demo-app-64dc955864-6bw7s to minikube
-  Normal  Pulled     113s  kubelet            Container image "hashicorp/vault:1.19.0" already present on machine
-  Normal  Created    112s  kubelet            Created container: vault-agent-init
-  Normal  Started    111s  kubelet            Started container vault-agent-init
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  2m12s  default-scheduler  Successfully assigned default/demo-app-5bbb7454c4-vggzf to minikube
+  Normal  Pulled     2m3s   kubelet            Container image "hashicorp/vault:1.19.0" already present on machine
+  Normal  Created    2m1s   kubelet            Created container: vault-agent-init
+  Normal  Started    119s   kubelet            Started container vault-agent-init
 
 
-Name:             nginx-tls-5b74c74f46-dq4rm
+Name:             nginx-tls-5b74c74f46-rd5ss
 Namespace:        default
 Priority:         0
 Service Account:  vault
 Node:             minikube/192.168.49.2
-Start Time:       Sat, 31 May 2025 08:54:25 +0900
+Start Time:       Thu, 03 Jul 2025 18:44:58 +0900
 Labels:           app=nginx-tls
                   pod-template-hash=5b74c74f46
 Annotations:      <none>
 Status:           Running
-IP:               10.244.3.29
+IP:               10.244.1.131
 IPs:
-  IP:           10.244.3.29
+  IP:           10.244.1.131
 Controlled By:  ReplicaSet/nginx-tls-5b74c74f46
 Containers:
   nginx:
-    Container ID:   docker://69b515d33ccd996066b572b2742243da9e77273c492c34c57edd9726e2ffde27
+    Container ID:   docker://24f78f2b9f68c9f5af597311cb0ba1d0d0b7543835545898c728211f35b2ce63
     Image:          nginx:1.25
     Image ID:       docker-pullable://nginx@sha256:a484819eb60211f5299034ac80f6a681b06f89e65866ce91f356ed7c72af059c
     Port:           443/TCP
     Host Port:      0/TCP
-    State:          Running
-      Started:      Sat, 31 May 2025 08:54:49 +0900
+    State:          Waiting
+      Reason:       CrashLoopBackOff
     Last State:     Terminated
       Reason:       Error
       Exit Code:    1
-      Started:      Sat, 31 May 2025 08:54:33 +0900
-      Finished:     Sat, 31 May 2025 08:54:34 +0900
-    Ready:          True
-    Restart Count:  2
+      Started:      Thu, 03 Jul 2025 18:46:55 +0900
+      Finished:     Thu, 03 Jul 2025 18:46:55 +0900
+    Ready:          False
+    Restart Count:  4
     Environment:    <none>
     Mounts:
       /etc/nginx/conf.d/default.conf from nginx-conf (rw,path="default.conf")
       /etc/nginx/ssl from ssl (rw)
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-cndc7 (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-qm7kp (ro)
   vault-agent:
-    Container ID:  docker://ba7a84e46738d00688a9e83718d194c5b50a8d711a20f41f04e9bc448175fbda
+    Container ID:  docker://fd81cc29361cb7887d035a1ae4a329e1c9fbef6ace2c8298c976f5862613ceca
     Image:         hashicorp/vault:1.15.4
     Image ID:      docker-pullable://hashicorp/vault@sha256:0b01ed3924e613381793de3f5e429ea6b4d9dac28592472f8007315495aba061
     Port:          <none>
@@ -540,20 +540,20 @@ Containers:
       agent
       -config=/etc/vault/config/vault-agent-config.hcl
     State:          Running
-      Started:      Sat, 31 May 2025 08:54:32 +0900
+      Started:      Thu, 03 Jul 2025 18:45:12 +0900
     Ready:          True
     Restart Count:  0
     Environment:    <none>
     Mounts:
       /etc/nginx/ssl from ssl (rw)
       /etc/vault/config/vault-agent-config.hcl from nginx-conf (rw,path="vault-agent-config.hcl")
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-cndc7 (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-qm7kp (ro)
 Conditions:
   Type                        Status
   PodReadyToStartContainers   True 
   Initialized                 True 
-  Ready                       True 
-  ContainersReady             True 
+  Ready                       False 
+  ContainersReady             False 
   PodScheduled                True 
 Volumes:
   ssl:
@@ -564,11 +564,11 @@ Volumes:
     Type:      ConfigMap (a volume populated by a ConfigMap)
     Name:      nginx-config
     Optional:  false
-  kube-api-access-cndc7:
+  kube-api-access-qm7kp:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
-    ConfigMapOptional:       <nil>
+    Optional:                false
     DownwardAPI:             true
 QoS Class:                   BestEffort
 Node-Selectors:              <none>
@@ -577,39 +577,39 @@ Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists fo
 Events:
   Type     Reason     Age                  From               Message
   ----     ------     ----                 ----               -------
-  Normal   Scheduled  116s                 default-scheduler  Successfully assigned default/nginx-tls-5b74c74f46-dq4rm to minikube
-  Normal   Pulled     111s                 kubelet            Container image "hashicorp/vault:1.15.4" already present on machine
-  Normal   Created    110s                 kubelet            Created container: vault-agent
-  Normal   Started    110s                 kubelet            Started container vault-agent
-  Warning  BackOff    106s (x2 over 107s)  kubelet            Back-off restarting failed container nginx in pod nginx-tls-5b74c74f46-dq4rm_default(761a59d8-f417-441e-bef4-345813246089)
-  Normal   Pulled     93s (x3 over 112s)   kubelet            Container image "nginx:1.25" already present on machine
-  Normal   Created    93s (x3 over 111s)   kubelet            Created container: nginx
-  Normal   Started    93s (x3 over 111s)   kubelet            Started container nginx
+  Normal   Scheduled  2m10s                default-scheduler  Successfully assigned default/nginx-tls-5b74c74f46-rd5ss to minikube
+  Normal   Pulled     118s                 kubelet            Container image "hashicorp/vault:1.15.4" already present on machine
+  Normal   Created    117s                 kubelet            Created container: vault-agent
+  Normal   Started    116s                 kubelet            Started container vault-agent
+  Normal   Pulled     15s (x5 over 2m2s)   kubelet            Container image "nginx:1.25" already present on machine
+  Normal   Created    14s (x5 over 2m)     kubelet            Created container: nginx
+  Normal   Started    14s (x5 over 118s)   kubelet            Started container nginx
+  Warning  BackOff    11s (x10 over 110s)  kubelet            Back-off restarting failed container nginx in pod nginx-tls-5b74c74f46-rd5ss_default(423c1d7f-fb2d-41f7-9529-7bffc61a0db6)
 
 
-Name:             postgres-b85d56587-lbhnh
+Name:             postgres-b85d56587-t9czm
 Namespace:        default
 Priority:         0
 Service Account:  default
 Node:             minikube/192.168.49.2
-Start Time:       Sat, 31 May 2025 08:54:23 +0900
+Start Time:       Thu, 03 Jul 2025 18:44:51 +0900
 Labels:           app=postgres
                   pod-template-hash=b85d56587
 Annotations:      <none>
 Status:           Running
-IP:               10.244.3.25
+IP:               10.244.1.127
 IPs:
-  IP:           10.244.3.25
+  IP:           10.244.1.127
 Controlled By:  ReplicaSet/postgres-b85d56587
 Containers:
   postgres:
-    Container ID:   docker://e7e79db0abced4ca2a7c8f394df007f12f9e4cf7a989dd0596faf322593d4412
+    Container ID:   docker://40b3eca2b65267aa8ea4d9c272bca730333873d7d5316f0f23045d85a3c12799
     Image:          postgres:15
-    Image ID:       docker-pullable://postgres@sha256:8f6fbd24a12304d2adc332a2162ee9ff9d6044045a0b07f94d6e53e73125e11c
+    Image ID:       docker-pullable://postgres@sha256:b8e11f8a8b383e19589a086a78b10f9ca69a39d6c9dcdd9342a8697544e8b3a0
     Port:           5432/TCP
     Host Port:      0/TCP
     State:          Running
-      Started:      Sat, 31 May 2025 08:54:25 +0900
+      Started:      Thu, 03 Jul 2025 18:44:55 +0900
     Ready:          True
     Restart Count:  0
     Environment:
@@ -618,7 +618,7 @@ Containers:
       POSTGRES_PASSWORD:  password
     Mounts:
       /var/lib/postgresql/data from postgres-storage (rw)
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-zmtmt (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-q5sl5 (ro)
 Conditions:
   Type                        Status
   PodReadyToStartContainers   True 
@@ -631,46 +631,46 @@ Volumes:
     Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
     Medium:     
     SizeLimit:  <unset>
-  kube-api-access-zmtmt:
+  kube-api-access-q5sl5:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
-    ConfigMapOptional:       <nil>
+    Optional:                false
     DownwardAPI:             true
 QoS Class:                   BestEffort
 Node-Selectors:              <none>
 Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
                              node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
 Events:
-  Type    Reason     Age   From               Message
-  ----    ------     ----  ----               -------
-  Normal  Scheduled  118s  default-scheduler  Successfully assigned default/postgres-b85d56587-lbhnh to minikube
-  Normal  Pulled     118s  kubelet            Container image "postgres:15" already present on machine
-  Normal  Created    118s  kubelet            Created container: postgres
-  Normal  Started    117s  kubelet            Started container postgres
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  2m17s  default-scheduler  Successfully assigned default/postgres-b85d56587-t9czm to minikube
+  Normal  Pulled     2m15s  kubelet            Container image "postgres:15" already present on machine
+  Normal  Created    2m14s  kubelet            Created container: postgres
+  Normal  Started    2m13s  kubelet            Started container postgres
 
 
-Name:             postgres-init-t2828
+Name:             postgres-init-p4jfq
 Namespace:        default
 Priority:         0
 Service Account:  default
 Node:             minikube/192.168.49.2
-Start Time:       Sat, 31 May 2025 08:54:23 +0900
-Labels:           batch.kubernetes.io/controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+Start Time:       Thu, 03 Jul 2025 18:44:54 +0900
+Labels:           batch.kubernetes.io/controller-uid=0752bf69-2224-49c5-93ba-98746f0c83ca
                   batch.kubernetes.io/job-name=postgres-init
-                  controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+                  controller-uid=0752bf69-2224-49c5-93ba-98746f0c83ca
                   job-name=postgres-init
 Annotations:      <none>
 Status:           Succeeded
-IP:               10.244.3.27
+IP:               10.244.1.129
 IPs:
-  IP:           10.244.3.27
+  IP:           10.244.1.129
 Controlled By:  Job/postgres-init
 Containers:
   psql:
-    Container ID:  docker://994b95ba0da807bc764b3556354a91e4a841a6a5a04249a78607040d29035923
+    Container ID:  docker://d5b7683fc25f47d2c1e5ca72ea30d78278e0c4802dabe4d34b5035565e730274
     Image:         postgres:15
-    Image ID:      docker-pullable://postgres@sha256:8f6fbd24a12304d2adc332a2162ee9ff9d6044045a0b07f94d6e53e73125e11c
+    Image ID:      docker-pullable://postgres@sha256:b8e11f8a8b383e19589a086a78b10f9ca69a39d6c9dcdd9342a8697544e8b3a0
     Port:          <none>
     Host Port:     <none>
     Command:
@@ -687,15 +687,15 @@ Containers:
     State:          Terminated
       Reason:       Completed
       Exit Code:    0
-      Started:      Sat, 31 May 2025 08:54:45 +0900
-      Finished:     Sat, 31 May 2025 08:54:45 +0900
+      Started:      Thu, 03 Jul 2025 18:45:33 +0900
+      Finished:     Thu, 03 Jul 2025 18:45:34 +0900
     Ready:          False
     Restart Count:  2
     Environment:
       PGPASSWORD:  password
     Mounts:
       /sql from sql-volume (rw)
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-84vjd (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-pc644 (ro)
 Conditions:
   Type                        Status
   PodReadyToStartContainers   False 
@@ -708,11 +708,11 @@ Volumes:
     Type:      ConfigMap (a volume populated by a ConfigMap)
     Name:      postgres-init-sql
     Optional:  false
-  kube-api-access-84vjd:
+  kube-api-access-pc644:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
-    ConfigMapOptional:       <nil>
+    Optional:                false
     DownwardAPI:             true
 QoS Class:                   BestEffort
 Node-Selectors:              <none>
@@ -721,11 +721,11 @@ Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists fo
 Events:
   Type     Reason     Age                  From               Message
   ----     ------     ----                 ----               -------
-  Normal   Scheduled  118s                 default-scheduler  Successfully assigned default/postgres-init-t2828 to minikube
-  Warning  BackOff    108s (x2 over 110s)  kubelet            Back-off restarting failed container psql in pod postgres-init-t2828_default(dbec76b0-d94a-4ee8-a5a1-ab6872928af6)
-  Normal   Pulled     97s (x3 over 116s)   kubelet            Container image "postgres:15" already present on machine
-  Normal   Created    97s (x3 over 115s)   kubelet            Created container: psql
-  Normal   Started    97s (x3 over 113s)   kubelet            Started container psql
+  Normal   Scheduled  2m15s                default-scheduler  Successfully assigned default/postgres-init-p4jfq to minikube
+  Warning  BackOff    112s (x2 over 113s)  kubelet            Back-off restarting failed container psql in pod postgres-init-p4jfq_default(3a7018a4-21ec-482c-bc4e-48e22a9e93ba)
+  Normal   Pulled     98s (x3 over 2m10s)  kubelet            Container image "postgres:15" already present on machine
+  Normal   Created    97s (x3 over 2m7s)   kubelet            Created container: psql
+  Normal   Started    96s (x3 over 2m4s)   kubelet            Started container psql
 
 
 Name:             vault-0
@@ -733,25 +733,25 @@ Namespace:        default
 Priority:         0
 Service Account:  vault
 Node:             minikube/192.168.49.2
-Start Time:       Sat, 31 May 2025 08:54:14 +0900
+Start Time:       Thu, 03 Jul 2025 18:44:38 +0900
 Labels:           app.kubernetes.io/instance=vault
                   app.kubernetes.io/name=vault
                   apps.kubernetes.io/pod-index=0
                   component=server
-                  controller-revision-hash=vault-6c6c65c574
+                  controller-revision-hash=vault-598784c65f
                   helm.sh/chart=vault-0.30.0
                   statefulset.kubernetes.io/pod-name=vault-0
 Annotations:      <none>
 Status:           Running
-IP:               10.244.3.24
+IP:               10.244.1.126
 IPs:
-  IP:           10.244.3.24
+  IP:           10.244.1.126
 Controlled By:  StatefulSet/vault
 Containers:
   vault:
-    Container ID:  docker://f90956a9553cfbada2f37af426b2f44880b09977f91842798b78a3959b90c49a
-    Image:         hashicorp/vault:1.19.0
-    Image ID:      docker-pullable://hashicorp/vault@sha256:bbb7f98dc67d9ebdda1256de288df1cb9a5450990e48338043690bee3b332c90
+    Container ID:  docker://1577465f8796a14331dfe2f32c3199edda8c0e8ebe3787229dfab83e5bc1d080
+    Image:         hashicorp/vault-enterprise:1.19.5-ent
+    Image ID:      docker-pullable://hashicorp/vault-enterprise@sha256:56aec1feea6f8374594281e2099324b5215a2e7bf91ceeb1f4551a111376bfce
     Ports:         8200/TCP, 8201/TCP, 8202/TCP
     Host Ports:    0/TCP, 0/TCP, 0/TCP
     Command:
@@ -760,10 +760,15 @@ Containers:
     Args:
       /usr/local/bin/docker-entrypoint.sh vault server -dev 
       
-    State:          Running
-      Started:      Sat, 31 May 2025 08:54:15 +0900
-    Ready:          True
-    Restart Count:  0
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Thu, 03 Jul 2025 18:46:26 +0900
+      Finished:     Thu, 03 Jul 2025 18:46:29 +0900
+    Ready:          False
+    Restart Count:  4
     Readiness:      exec [/bin/sh -ec vault status -tls-skip-verify] delay=5s timeout=3s period=5s #success=1 #failure=2
     Environment:
       HOST_IP:                    (v1:status.hostIP)
@@ -777,62 +782,70 @@ Containers:
       HOSTNAME:                  vault-0 (v1:metadata.name)
       VAULT_CLUSTER_ADDR:        https://$(HOSTNAME).vault-internal:8201
       HOME:                      /home/vault
+      VAULT_LICENSE_PATH:        /vault/license/vault.hclic
       VAULT_DEV_ROOT_TOKEN_ID:   root
       VAULT_DEV_LISTEN_ADDRESS:  [::]:8200
       VAULT_DEV_ROOT_TOKEN_ID:   root
+      VAULT_LICENSE:             
     Mounts:
       /home/vault from home (rw)
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-zpksm (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-qcxjr (ro)
+      /vault/license from vault-license (ro)
 Conditions:
   Type                        Status
   PodReadyToStartContainers   True 
   Initialized                 True 
-  Ready                       True 
-  ContainersReady             True 
+  Ready                       False 
+  ContainersReady             False 
   PodScheduled                True 
 Volumes:
+  vault-license:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  vault-enterprise-license
+    Optional:    false
   home:
     Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
     Medium:     
     SizeLimit:  <unset>
-  kube-api-access-zpksm:
+  kube-api-access-qcxjr:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
-    ConfigMapOptional:       <nil>
+    Optional:                false
     DownwardAPI:             true
 QoS Class:                   BestEffort
 Node-Selectors:              <none>
 Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
                              node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
 Events:
-  Type    Reason     Age   From               Message
-  ----    ------     ----  ----               -------
-  Normal  Scheduled  2m7s  default-scheduler  Successfully assigned default/vault-0 to minikube
-  Normal  Pulled     2m7s  kubelet            Container image "hashicorp/vault:1.19.0" already present on machine
-  Normal  Created    2m7s  kubelet            Created container: vault
-  Normal  Started    2m7s  kubelet            Started container vault
+  Type     Reason     Age                  From               Message
+  ----     ------     ----                 ----               -------
+  Normal   Scheduled  2m30s                default-scheduler  Successfully assigned default/vault-0 to minikube
+  Normal   Pulled     44s (x5 over 2m28s)  kubelet            Container image "hashicorp/vault-enterprise:1.19.5-ent" already present on machine
+  Normal   Created    43s (x5 over 2m28s)  kubelet            Created container: vault
+  Normal   Started    42s (x5 over 2m28s)  kubelet            Started container vault
+  Warning  BackOff    5s (x14 over 2m24s)  kubelet            Back-off restarting failed container vault in pod vault-0_default(1208bf61-7b0a-4f4b-827c-574041b81074)
 
 
-Name:             vault-agent-injector-75f9dfc9c8-4jthz
+Name:             vault-agent-injector-75f9dfc9c8-pmwrk
 Namespace:        default
 Priority:         0
 Service Account:  vault-agent-injector
 Node:             minikube/192.168.49.2
-Start Time:       Sat, 31 May 2025 08:54:14 +0900
+Start Time:       Thu, 03 Jul 2025 18:44:38 +0900
 Labels:           app.kubernetes.io/instance=vault
                   app.kubernetes.io/name=vault-agent-injector
                   component=webhook
                   pod-template-hash=75f9dfc9c8
 Annotations:      <none>
 Status:           Running
-IP:               10.244.3.23
+IP:               10.244.1.125
 IPs:
-  IP:           10.244.3.23
+  IP:           10.244.1.125
 Controlled By:  ReplicaSet/vault-agent-injector-75f9dfc9c8
 Containers:
   sidecar-injector:
-    Container ID:  docker://9b5d2fbe509dd288e499b5597abfe03812a91ba3609db78e8d02eef54b5c4cb8
+    Container ID:  docker://78b8fd2ba9012a97762b9178da4a9bbe053c217fede1b16f434fa3f5f5fa4868
     Image:         hashicorp/vault-k8s:1.6.2
     Image ID:      docker-pullable://hashicorp/vault-k8s@sha256:103a2d817a7474a8b678d830b0d6ed2d570cc878e4bc8c146d8d35ec436a8d49
     Port:          <none>
@@ -841,7 +854,7 @@ Containers:
       agent-inject
       2>&1
     State:          Running
-      Started:      Sat, 31 May 2025 08:54:15 +0900
+      Started:      Thu, 03 Jul 2025 18:44:41 +0900
     Ready:          True
     Restart Count:  0
     Liveness:       http-get https://:8080/health/ready delay=5s timeout=5s period=2s #success=1 #failure=2
@@ -863,9 +876,9 @@ Containers:
       AGENT_INJECT_MEM_LIMIT:                              128Mi
       AGENT_INJECT_DEFAULT_TEMPLATE:                       map
       AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE:  true
-      POD_NAME:                                            vault-agent-injector-75f9dfc9c8-4jthz (v1:metadata.name)
+      POD_NAME:                                            vault-agent-injector-75f9dfc9c8-pmwrk (v1:metadata.name)
     Mounts:
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-twks4 (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-jq8d9 (ro)
 Conditions:
   Type                        Status
   PodReadyToStartContainers   True 
@@ -874,44 +887,44 @@ Conditions:
   ContainersReady             True 
   PodScheduled                True 
 Volumes:
-  kube-api-access-twks4:
+  kube-api-access-jq8d9:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
-    ConfigMapOptional:       <nil>
+    Optional:                false
     DownwardAPI:             true
 QoS Class:                   BestEffort
 Node-Selectors:              <none>
 Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
                              node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
 Events:
-  Type    Reason     Age   From               Message
-  ----    ------     ----  ----               -------
-  Normal  Scheduled  2m8s  default-scheduler  Successfully assigned default/vault-agent-injector-75f9dfc9c8-4jthz to minikube
-  Normal  Pulled     2m8s  kubelet            Container image "hashicorp/vault-k8s:1.6.2" already present on machine
-  Normal  Created    2m7s  kubelet            Created container: sidecar-injector
-  Normal  Started    2m7s  kubelet            Started container sidecar-injector
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  2m31s  default-scheduler  Successfully assigned default/vault-agent-injector-75f9dfc9c8-pmwrk to minikube
+  Normal  Pulled     2m28s  kubelet            Container image "hashicorp/vault-k8s:1.6.2" already present on machine
+  Normal  Started    2m28s  kubelet            Started container sidecar-injector
+  Normal  Created    2m28s  kubelet            Created container: sidecar-injector
 
 
-Name:             vault-init-jjcl5
+Name:             vault-init-7d7lx
 Namespace:        default
 Priority:         0
 Service Account:  vault
 Node:             minikube/192.168.49.2
-Start Time:       Sat, 31 May 2025 08:54:23 +0900
-Labels:           batch.kubernetes.io/controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+Start Time:       Thu, 03 Jul 2025 18:44:53 +0900
+Labels:           batch.kubernetes.io/controller-uid=af9e4924-abf6-447f-86de-be758d21edf3
                   batch.kubernetes.io/job-name=vault-init
-                  controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+                  controller-uid=af9e4924-abf6-447f-86de-be758d21edf3
                   job-name=vault-init
 Annotations:      <none>
-Status:           Succeeded
-IP:               10.244.3.26
+Status:           Running
+IP:               10.244.1.128
 IPs:
-  IP:           10.244.3.26
+  IP:           10.244.1.128
 Controlled By:  Job/vault-init
 Containers:
   vault-init:
-    Container ID:  docker://925766dd304585dba4bc6f5d69bb220465d9ee390e933d153cd6e01d3c6af399
+    Container ID:  docker://b614d72c415ca4c86d490889164c8555821815a3ea2ccf950dc8b40d75d8359a
     Image:         hashicorp/vault:1.15.4
     Image ID:      docker-pullable://hashicorp/vault@sha256:0b01ed3924e613381793de3f5e429ea6b4d9dac28592472f8007315495aba061
     Port:          <none>
@@ -1009,22 +1022,58 @@ Containers:
       
       echo "Vault PKI Init Complete"
       
-    State:          Terminated
-      Reason:       Completed
-      Exit Code:    0
-      Started:      Sat, 31 May 2025 08:54:35 +0900
-      Finished:     Sat, 31 May 2025 08:54:38 +0900
+      echo "Enable Transform engine"
+      vault secrets enable transform || true
+      
+      echo "Configure FPE for PAN"
+       vault write transform/transformation/fpe-pan-transform \
+        type=fpe \
+        template="builtin/creditcardnumber" \
+        allowed_roles="fpe-pan-role" \
+        tweak_source="internal"
+      
+      vault write transform/role/fpe-pan-role \
+        transformations=fpe-pan-transform
+      
+      echo "Configure Tokenization for Credit Card Number Format"
+       vault write transform/transformations/tokenization/token-ccn \
+        max_ttl=24h \
+        allowed_roles=token-ccn-role
+      
+      vault write transform/role/token-ccn-role \
+        transformations=token-ccn
+      
+      ## Masking for PAN display
+      echo "Configure Masking for PAN"
+      vault write transform/transformation/mask-pan \
+        type=masking \
+        template="builtin/creditcardnumber" \
+        masking_character="*" \
+        allowed_roles=mask-pan-role
+      
+      vault write transform/role/mask-pan-role \
+        transformations=mask-pan
+      
+      echo "✅ Vault Transform configuration complete"
+      
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    2
+      Started:      Thu, 03 Jul 2025 18:46:35 +0900
+      Finished:     Thu, 03 Jul 2025 18:46:36 +0900
     Ready:          False
-    Restart Count:  1
+    Restart Count:  4
     Environment:
       VAULT_TOKEN:  root
     Mounts:
       /tmp/sql/init from init-sql-volume (rw)
       /tmp/sql/readonly from readonly-role-volume (rw)
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-lrwjj (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-rpksp (ro)
 Conditions:
   Type                        Status
-  PodReadyToStartContainers   False 
+  PodReadyToStartContainers   True 
   Initialized                 True 
   Ready                       False 
   ContainersReady             False 
@@ -1038,23 +1087,24 @@ Volumes:
     Type:      ConfigMap (a volume populated by a ConfigMap)
     Name:      readonly-role-sql
     Optional:  false
-  kube-api-access-lrwjj:
+  kube-api-access-rpksp:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
-    ConfigMapOptional:       <nil>
+    Optional:                false
     DownwardAPI:             true
 QoS Class:                   BestEffort
 Node-Selectors:              <none>
 Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
                              node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
 Events:
-  Type    Reason     Age                  From               Message
-  ----    ------     ----                 ----               -------
-  Normal  Scheduled  118s                 default-scheduler  Successfully assigned default/vault-init-jjcl5 to minikube
-  Normal  Pulled     107s (x2 over 117s)  kubelet            Container image "hashicorp/vault:1.15.4" already present on machine
-  Normal  Created    107s (x2 over 117s)  kubelet            Created container: vault-init
-  Normal  Started    107s (x2 over 115s)  kubelet            Started container vault-init
+  Type     Reason     Age                  From               Message
+  ----     ------     ----                 ----               -------
+  Normal   Scheduled  2m16s                default-scheduler  Successfully assigned default/vault-init-7d7lx to minikube
+  Normal   Pulled     35s (x5 over 2m13s)  kubelet            Container image "hashicorp/vault:1.15.4" already present on machine
+  Normal   Created    34s (x5 over 2m12s)  kubelet            Created container: vault-init
+  Normal   Started    34s (x5 over 2m9s)   kubelet            Started container vault-init
+  Warning  BackOff    10s (x11 over 114s)  kubelet            Back-off restarting failed container vault-init in pod vault-init-7d7lx_default(57f04059-8549-4f4b-9a21-a88ed71bbfd4)
 
 
 Name:                     demo-app
@@ -1065,11 +1115,11 @@ Selector:                 app=demo-app
 Type:                     ClusterIP
 IP Family Policy:         SingleStack
 IP Families:              IPv4
-IP:                       10.102.216.68
-IPs:                      10.102.216.68
+IP:                       10.101.127.151
+IPs:                      10.101.127.151
 Port:                     <unset>  5000/TCP
 TargetPort:               5000/TCP
-Endpoints:                10.244.3.28:5000
+Endpoints:                
 Session Affinity:         None
 Internal Traffic Policy:  Cluster
 Events:                   <none>
@@ -1102,12 +1152,12 @@ Selector:                 app=nginx-tls
 Type:                     NodePort
 IP Family Policy:         SingleStack
 IP Families:              IPv4
-IP:                       10.104.213.202
-IPs:                      10.104.213.202
+IP:                       10.107.168.200
+IPs:                      10.107.168.200
 Port:                     <unset>  443/TCP
 TargetPort:               443/TCP
 NodePort:                 <unset>  30443/TCP
-Endpoints:                10.244.3.29:443
+Endpoints:                
 Session Affinity:         None
 External Traffic Policy:  Cluster
 Internal Traffic Policy:  Cluster
@@ -1122,11 +1172,11 @@ Selector:                 app=postgres
 Type:                     ClusterIP
 IP Family Policy:         SingleStack
 IP Families:              IPv4
-IP:                       10.103.235.228
-IPs:                      10.103.235.228
+IP:                       10.96.193.93
+IPs:                      10.96.193.93
 Port:                     <unset>  5432/TCP
 TargetPort:               5432/TCP
-Endpoints:                10.244.3.25:5432
+Endpoints:                10.244.1.127:5432
 Session Affinity:         None
 Internal Traffic Policy:  Cluster
 Events:                   <none>
@@ -1144,14 +1194,14 @@ Selector:                 app.kubernetes.io/instance=vault,app.kubernetes.io/nam
 Type:                     ClusterIP
 IP Family Policy:         SingleStack
 IP Families:              IPv4
-IP:                       10.101.248.141
-IPs:                      10.101.248.141
+IP:                       10.111.236.29
+IPs:                      10.111.236.29
 Port:                     http  8200/TCP
 TargetPort:               8200/TCP
-Endpoints:                10.244.3.24:8200
+Endpoints:                10.244.1.126:8200
 Port:                     https-internal  8201/TCP
 TargetPort:               8201/TCP
-Endpoints:                10.244.3.24:8201
+Endpoints:                10.244.1.126:8201
 Session Affinity:         None
 Internal Traffic Policy:  Cluster
 Events:                   <none>
@@ -1168,11 +1218,11 @@ Selector:                 app.kubernetes.io/instance=vault,app.kubernetes.io/nam
 Type:                     ClusterIP
 IP Family Policy:         SingleStack
 IP Families:              IPv4
-IP:                       10.107.255.29
-IPs:                      10.107.255.29
+IP:                       10.96.135.123
+IPs:                      10.96.135.123
 Port:                     https  443/TCP
 TargetPort:               8080/TCP
-Endpoints:                10.244.3.23:8080
+Endpoints:                10.244.1.125:8080
 Session Affinity:         None
 Internal Traffic Policy:  Cluster
 Events:                   <none>
@@ -1195,10 +1245,10 @@ IP:                       None
 IPs:                      None
 Port:                     http  8200/TCP
 TargetPort:               8200/TCP
-Endpoints:                10.244.3.24:8200
+Endpoints:                10.244.1.126:8200
 Port:                     https-internal  8201/TCP
 TargetPort:               8201/TCP
-Endpoints:                10.244.3.24:8201
+Endpoints:                10.244.1.126:8201
 Session Affinity:         None
 Internal Traffic Policy:  Cluster
 Events:                   <none>
@@ -1206,7 +1256,7 @@ Events:                   <none>
 
 Name:                   demo-app
 Namespace:              default
-CreationTimestamp:      Sat, 31 May 2025 08:54:24 +0900
+CreationTimestamp:      Thu, 03 Jul 2025 18:44:56 +0900
 Labels:                 app=demo-app
 Annotations:            deployment.kubernetes.io/revision: 1
 Selector:               app=demo-app
@@ -1236,13 +1286,16 @@ Pod Template:
       /bin/sh
       -c
     Args:
-      pip install flask psycopg2-binary requests pyOpenSSL;
+      pip install flask psycopg2-binary requests pyOpenSSL pytz;
       
       cat <<EOF > app.py
-      from flask import Flask, request, render_template_string
-      import psycopg2, os, time, datetime, requests
+      from flask import Flask, request, render_template_string, redirect
+      import psycopg2, os, time, datetime, requests, pytz 
       
       app = Flask(__name__)
+      is_auto_refresh = True
+      initial_creds = {}
+      initial_loaded_time = ""
       
       def load_env_file(path):
           creds = {}
@@ -1253,15 +1306,45 @@ Pod Template:
                       creds[k] = v
           return creds
       
+      def load_secret(path="/vault/secrets/db-creds"):
+          if not os.path.exists(path):
+              return None, "シークレットファイルが見つかりません", None
+          try:
+              creds = load_env_file(path)
+              updated = os.path.getmtime(path)
+              jst = pytz.timezone("Asia/Tokyo")
+              updated_str = datetime.datetime.fromtimestamp(updated, tz=jst).strftime('%Y-%m-%d %H:%M:%S')
+              vault_max_ttl = 30
+              remaining = max(0, int(vault_max_ttl - (time.time() - updated)))
+              return creds, updated_str, remaining
+          except Exception as e:
+              return None, str(e), None
+      
+      @app.route("/toggle", methods=["POST"])
+      def toggle():
+          global is_auto_refresh
+          is_auto_refresh = not is_auto_refresh
+          return redirect("/")
+      
       @app.route("/")
       def index():
+          global is_auto_refresh, initial_creds, initial_loaded_time
+      
           secret_path = "/vault/secrets/db-creds"
-          if not os.path.exists(secret_path):
-              return "<h2 style='color:red;'>Vaultのシークレットが見つかりません</h2>"
-          try:
-              creds = load_env_file(secret_path)
-          except Exception as e:
-              return f"<h2 style='color:red;'>シークレット読み込みエラー: {e}</h2>"
+          db_error = False
+      
+          jst = pytz.timezone("Asia/Tokyo")
+      
+          if is_auto_refresh:
+              creds, updated_str, remaining_secs = load_secret(secret_path)
+              if creds is None:
+                  return error_screen(updated_str)
+              remaining = f"{remaining_secs} 秒"
+          else:
+              if not initial_creds:
+                  initial_creds, initial_loaded_time, _ = load_secret(secret_path)
+              creds, updated_str, _ = initial_creds, initial_loaded_time, 0
+              remaining = "Secret期限切れまであと少し・・・"
       
           try:
               connection = psycopg2.connect(
@@ -1272,51 +1355,96 @@ Pod Template:
               )
               cursor = connection.cursor()
               cursor.execute("SELECT name, stock, updated_at FROM inventory")
-              items = [{"name": r[0], "stock": r[1], "updated_at": r[2]} for r in cursor.fetchall()]
+              items = [{"name": r[0], "stock": r[1], "updated_at": r[2].astimezone(jst).strftime('%Y-%m-%d %H:%M:%S')} for r in cursor.fetchall()]
               cursor.close()
               connection.close()
-          except Exception as db_err:
-              return f"<h2 style='color:red;'>DB接続エラー: {db_err}</h2>"
+          except Exception:
+              db_error = True
+              items = []
       
           html_template = '''
           <!DOCTYPE html>
           <html lang="ja">
           <head>
               <meta charset="UTF-8">
-              <title>在庫管理システム</title>
+              <meta http-equiv="refresh" content="3">
+              <title>在庫管理ダッシュボード</title>
               <style>
-                  body { font-family: sans-serif; margin: 40px; background-color: #f9f9f9; }
-                  h1 { color: #333; }
-                  table { width: 80%; border-collapse: collapse; margin-top: 20px; }
-                  th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
-                  th { background-color: #f0f0f0; }
-                  tr:nth-child(even) { background-color: #fdfdfd; }
+                  body { font-family: 'Roboto', sans-serif; background-color: #f0f2f5; padding: 40px; }
+                  .cards { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+                  .card {
+                      background: {{ "white" if not db_error else "#ffe5e5" }};
+                      border-radius: 12px;
+                      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                      padding: 20px;
+                      width: 280px;
+                      border: {{ "none" if not db_error else "2px solid red" }};
+                  }
+                  .section { margin-top: 40px; text-align: center; }
+                  button { font-size: 1em; padding: 10px 20px; margin-bottom: 20px; }
               </style>
           </head>
           <body>
-              <h1>在庫管理ダッシュボード</h1>
-              <table>
-                  <thead>
-                      <tr>
-                          <th>商品名</th>
-                          <th>在庫数</th>
-                          <th>最終更新日</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      {% for item in items %}
-                      <tr>
-                          <td>{{ item['name'] }}</td>
-                          <td>{{ item['stock'] }}</td>
-                          <td>{{ item['updated_at'] }}</td>
-                      </tr>
-                      {% endfor %}
-                  </tbody>
-              </table>
-          </body>
-          </html>
+              <a href='/transit'>🔁 Transit デモへ</a>
+              <a href='/transform'>🔣 Transform デモへ</a>
+              <h1>📦 在庫管理ダッシュボード</h1>
+      
+              <div style="text-align: center;">
+                <form action="/toggle" method="post" style="display: inline-block;">
+                  <button type="submit">自動更新: {{ "ON 🔄" if is_auto_refresh else "OFF ⛔" }}</button>
+                </form>
+              </div>
+              <div class="cards">
+                  {% if db_error %}
+                  <div class="card">
+                      <h3 style="color:red;">⚠ 在庫データ取得エラー</h3>
+                      <p>資格情報が無効になっている可能性があります。</p>
+                      <p style="color:#888;">自動更新をONにしてVault Agentにより資格情報を更新してください。</p>
+                  </div>
+                  {% else %}
+                  {% for item in items %}
+                  <div class="card">
+                      <h3>{{ item['name'] }}</h3>
+                      <div>在庫数: {{ item['stock'] }}</div>
+                      <div>更新日: {{ item['updated_at'] }}</div>
+                  </div>
+                  {% endfor %}
+                  {% endif %}
+              </div>
+              <div class="section">
+                  <h2>📂 Secret ファイルの状態</h2>
+                  <div style="display: flex; justify-content: center;">
+                  <table style="text-align: left;">
+                      <tr><th style="padding: 4px 12px;">ファイルパス</th><td>{{ "/vault/secrets/db-creds" }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">最終更新日時</th><td>{{ updated_str }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">TTL 残り秒数</th><td>{{ remaining }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">DB_USER</th><td>{{ creds.get("DB_USER") }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">DB_PASSWORD</th><td>{{ creds.get("DB_PASSWORD") }}</td></tr>
+                  </table>
+                  </div>
+              </div>
+          </body></html>
           '''
-          return render_template_string(html_template, items=items)
+      
+          return render_template_string(html_template,
+                                        items=items,
+                                        creds=creds,
+                                        updated_str=updated_str,
+                                        remaining=remaining,
+                                        is_auto_refresh=is_auto_refresh,
+                                        db_error=db_error)
+      
+      def error_screen(message):
+          return f'''
+          <html><body style="text-align:center;padding:40px;font-family:sans-serif;">
+          <h1 style="color:red;">現在、在庫情報を取得できません</h1>
+          <p>{message}</p>
+          <p style="color:#888;">自動更新がOFFの場合、一定時間で接続が無効になることがあります。</p>
+          <form action="/toggle" method="post">
+              <button type="submit">自動更新をONにする</button>
+          </form>
+          </body></html>
+          '''
       
       @app.route("/transit", methods=["GET", "POST"])
       def transit_demo():
@@ -1355,26 +1483,117 @@ Pod Template:
       
           return f"""
           <html>
+          <head>
+            <style>
+              body {{ font-family: Arial; }}
+              .container {{ display: flex; gap: 40px; }}
+              .box {{ flex: 1; border: 1px solid #ccc; padding: 20px; }}
+              input, textarea {{ width: 100%; margin-top: 8px; }}
+              textarea {{ height: 100px; }}
+            </style>
+          </head>
           <body>
             <h2>🔐 Vault Transit Engine Demo</h2>
             <a href="/">⬅ DB Secret デモへ戻る</a>
-            <form method="post">
-              <input type="hidden" name="mode" value="encrypt" />
-              <label>平文:</label><br>
-              <input name="encrypt_input" value="{encrypt_input}" /><br><br>
-              <button type="submit">🔒 暗号化</button>
-            </form>
-            <pre>{ciphertext}</pre>
-            <form method="post">
-              <input type="hidden" name="mode" value="decrypt" />
-              <label>暗号文:</label><br>
-              <textarea name="decrypt_input">{decrypt_input}</textarea><br>
-              <button type="submit">🔓 復号化</button>
-            </form>
-            <pre>{plaintext}</pre>
+            <div class="container">
+              <div class="box">
+                <h3>📝 暗号化</h3>
+                <form method="post">
+                  <input type="hidden" name="mode" value="encrypt" />
+                  <label>平文:</label><br>
+                  <input name="encrypt_input" value="{encrypt_input}" /><br><br>
+                  <button type="submit">🔒 暗号化</button>
+                </form>
+                {"<h4>暗号化結果:</h4><textarea readonly>" + ciphertext + "</textarea>" if ciphertext else ""}
+                {"<h4>curl:</h4><textarea readonly>" + encrypt_curl + "</textarea>" if encrypt_curl else ""}
+              </div>
+              <div class="box">
+                <h3>🔓 復号化</h3>
+                <form method="post">
+                  <input type="hidden" name="mode" value="decrypt" />
+                  <label>暗号文:</label><br>
+                  <textarea name="decrypt_input">{decrypt_input}</textarea><br>
+                  <button type="submit">🔓 復号化</button>
+                </form>
+                {"<h4>復号結果:</h4><textarea readonly>" + plaintext + "</textarea>" if plaintext else ""}
+                {"<h4>curl:</h4><textarea readonly>" + decrypt_curl + "</textarea>" if decrypt_curl else ""}
+              </div>
+            </div>
           </body>
           </html>
-          """
+         """
+      
+      @app.route("/transform", methods=["GET", "POST"])
+      def transform_demo():
+        VAULT_ADDR = "http://vault:8200"
+        VAULT_TOKEN = "root"
+        input_value = ""
+        fpe_result = token_result = mask_result = ""
+        fpe_curl = token_curl = mask_curl = ""
+      
+        if request.method == "POST":
+          input_value = request.form["input_value"]
+          role_map = {
+            "fpe": ("fpe-pan-transform", "fpe-pan-role"),
+            "token": ("token-ccn", "token-ccn-role"),
+            "mask": ("mask-pan", "mask-pan-role"),
+          }
+      
+          for ttype in ["fpe", "token", "mask"]:
+            tpl, role = role_map[ttype]
+            res = requests.post(
+              f"{VAULT_ADDR}/v1/transform/encode/{role}",
+              headers={"X-Vault-Token": VAULT_TOKEN},
+              json={"value": input_value, "role": role}
+            ).json()
+            result = res.get("data", {}).get("encoded_value", "")
+            curl = f"""curl -s -H 'X-Vault-Token: {VAULT_TOKEN}' -d '{{"value":"{input_value}","role":"{role}"}}' {VAULT_ADDR}/v1/transform/encode/{role}"""
+            if ttype == "fpe":
+              fpe_result, fpe_curl = result, curl
+            elif ttype == "token":
+              token_result, token_curl = result, curl
+            elif ttype == "mask":
+              mask_result, mask_curl = result, curl
+        return f"""
+        <html>
+        <head>
+        <style>
+          body {{ font-family: Arial; }}
+          .container {{ display: flex; gap: 30px; flex-wrap: wrap; }}
+          .box {{ flex: 1; border: 1px solid #ccc; padding: 20px; min-width: 300px; }}
+          input, textarea {{ width: 100%; margin-top: 8px; }}
+          textarea {{ height: 80px; }}
+        </style>
+        </head>
+        <body>
+        <h2>🔣 Vault Transform Engine Demo</h2>
+        <a href="/">⬅ 戻る</a> |
+        <a href="/transit">🔁 Transit デモへ</a>
+        <form method="post">
+          <label>変換対象データ:</label><br>
+          <input name="input_value" value="{input_value}" /><br><br>
+          <button type="submit">🚀 変換を実行</button>
+        </form>
+        <div class="container">
+          <div class="box">
+          <h3>🔐 FPE (例: クレジットカード番号)</h3>
+          {"<textarea readonly>" + fpe_result + "</textarea>" if fpe_result else ""}
+          {"<h4>curl:</h4><textarea readonly>" + fpe_curl + "</textarea>" if fpe_curl else ""}
+          </div>
+          <div class="box">
+          <h3>🔁 Tokenization (例: マイナンバー)</h3>
+          {"<textarea readonly>" + token_result + "</textarea>" if token_result else ""}
+          {"<h4>curl:</h4><textarea readonly>" + token_curl + "</textarea>" if token_curl else ""}
+          </div>
+          <div class="box">
+          <h3>🔍 Masking 表示</h3>
+          {"<textarea readonly>" + mask_result + "</textarea>" if mask_result else ""}
+          {"<h4>curl:</h4><textarea readonly>" + mask_curl + "</textarea>" if mask_curl else ""}
+          </div>
+        </div>
+        </body>
+        </html>
+        """
       
       if __name__ == "__main__":
           app.run(host="0.0.0.0", port=5000)
@@ -1398,20 +1617,20 @@ Conditions:
   Available      False   MinimumReplicasUnavailable
   Progressing    True    ReplicaSetUpdated
 OldReplicaSets:  <none>
-NewReplicaSet:   demo-app-64dc955864 (1/1 replicas created)
+NewReplicaSet:   demo-app-5bbb7454c4 (1/1 replicas created)
 Events:
-  Type    Reason             Age   From                   Message
-  ----    ------             ----  ----                   -------
-  Normal  ScalingReplicaSet  118s  deployment-controller  Scaled up replica set demo-app-64dc955864 from 0 to 1
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  2m14s  deployment-controller  Scaled up replica set demo-app-5bbb7454c4 from 0 to 1
 
 
 Name:                   nginx-tls
 Namespace:              default
-CreationTimestamp:      Sat, 31 May 2025 08:54:24 +0900
+CreationTimestamp:      Thu, 03 Jul 2025 18:44:57 +0900
 Labels:                 app=nginx-tls
 Annotations:            deployment.kubernetes.io/revision: 1
 Selector:               app=nginx-tls
-Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+Replicas:               1 desired | 1 updated | 1 total | 0 available | 1 unavailable
 StrategyType:           RollingUpdate
 MinReadySeconds:        0
 RollingUpdateStrategy:  25% max unavailable, 25% max surge
@@ -1453,19 +1672,19 @@ Pod Template:
 Conditions:
   Type           Status  Reason
   ----           ------  ------
-  Available      True    MinimumReplicasAvailable
-  Progressing    True    NewReplicaSetAvailable
+  Available      False   MinimumReplicasUnavailable
+  Progressing    True    ReplicaSetUpdated
 OldReplicaSets:  <none>
 NewReplicaSet:   nginx-tls-5b74c74f46 (1/1 replicas created)
 Events:
-  Type    Reason             Age   From                   Message
-  ----    ------             ----  ----                   -------
-  Normal  ScalingReplicaSet  117s  deployment-controller  Scaled up replica set nginx-tls-5b74c74f46 from 0 to 1
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  2m13s  deployment-controller  Scaled up replica set nginx-tls-5b74c74f46 from 0 to 1
 
 
 Name:                   postgres
 Namespace:              default
-CreationTimestamp:      Sat, 31 May 2025 08:54:23 +0900
+CreationTimestamp:      Thu, 03 Jul 2025 18:44:51 +0900
 Labels:                 app=postgres
 Annotations:            deployment.kubernetes.io/revision: 1
 Selector:               app=postgres
@@ -1501,14 +1720,14 @@ Conditions:
 OldReplicaSets:  <none>
 NewReplicaSet:   postgres-b85d56587 (1/1 replicas created)
 Events:
-  Type    Reason             Age   From                   Message
-  ----    ------             ----  ----                   -------
-  Normal  ScalingReplicaSet  119s  deployment-controller  Scaled up replica set postgres-b85d56587 from 0 to 1
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  2m19s  deployment-controller  Scaled up replica set postgres-b85d56587 from 0 to 1
 
 
 Name:                   vault-agent-injector
 Namespace:              default
-CreationTimestamp:      Sat, 31 May 2025 08:54:14 +0900
+CreationTimestamp:      Thu, 03 Jul 2025 18:44:38 +0900
 Labels:                 app.kubernetes.io/instance=vault
                         app.kubernetes.io/managed-by=Helm
                         app.kubernetes.io/name=vault-agent-injector
@@ -1566,16 +1785,16 @@ Conditions:
 OldReplicaSets:  <none>
 NewReplicaSet:   vault-agent-injector-75f9dfc9c8 (1/1 replicas created)
 Events:
-  Type    Reason             Age   From                   Message
-  ----    ------             ----  ----                   -------
-  Normal  ScalingReplicaSet  2m8s  deployment-controller  Scaled up replica set vault-agent-injector-75f9dfc9c8 from 0 to 1
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  2m32s  deployment-controller  Scaled up replica set vault-agent-injector-75f9dfc9c8 from 0 to 1
 
 
-Name:           demo-app-64dc955864
+Name:           demo-app-5bbb7454c4
 Namespace:      default
-Selector:       app=demo-app,pod-template-hash=64dc955864
+Selector:       app=demo-app,pod-template-hash=5bbb7454c4
 Labels:         app=demo-app
-                pod-template-hash=64dc955864
+                pod-template-hash=5bbb7454c4
 Annotations:    deployment.kubernetes.io/desired-replicas: 1
                 deployment.kubernetes.io/max-replicas: 2
                 deployment.kubernetes.io/revision: 1
@@ -1584,7 +1803,7 @@ Replicas:       1 current / 1 desired
 Pods Status:    0 Running / 1 Waiting / 0 Succeeded / 0 Failed
 Pod Template:
   Labels:           app=demo-app
-                    pod-template-hash=64dc955864
+                    pod-template-hash=5bbb7454c4
   Annotations:      vault.hashicorp.com/agent-init-first: true
                     vault.hashicorp.com/agent-inject: true
                     vault.hashicorp.com/agent-inject-secret-db-creds: database/creds/readonly-role
@@ -1605,13 +1824,16 @@ Pod Template:
       /bin/sh
       -c
     Args:
-      pip install flask psycopg2-binary requests pyOpenSSL;
+      pip install flask psycopg2-binary requests pyOpenSSL pytz;
       
       cat <<EOF > app.py
-      from flask import Flask, request, render_template_string
-      import psycopg2, os, time, datetime, requests
+      from flask import Flask, request, render_template_string, redirect
+      import psycopg2, os, time, datetime, requests, pytz 
       
       app = Flask(__name__)
+      is_auto_refresh = True
+      initial_creds = {}
+      initial_loaded_time = ""
       
       def load_env_file(path):
           creds = {}
@@ -1622,15 +1844,45 @@ Pod Template:
                       creds[k] = v
           return creds
       
+      def load_secret(path="/vault/secrets/db-creds"):
+          if not os.path.exists(path):
+              return None, "シークレットファイルが見つかりません", None
+          try:
+              creds = load_env_file(path)
+              updated = os.path.getmtime(path)
+              jst = pytz.timezone("Asia/Tokyo")
+              updated_str = datetime.datetime.fromtimestamp(updated, tz=jst).strftime('%Y-%m-%d %H:%M:%S')
+              vault_max_ttl = 30
+              remaining = max(0, int(vault_max_ttl - (time.time() - updated)))
+              return creds, updated_str, remaining
+          except Exception as e:
+              return None, str(e), None
+      
+      @app.route("/toggle", methods=["POST"])
+      def toggle():
+          global is_auto_refresh
+          is_auto_refresh = not is_auto_refresh
+          return redirect("/")
+      
       @app.route("/")
       def index():
+          global is_auto_refresh, initial_creds, initial_loaded_time
+      
           secret_path = "/vault/secrets/db-creds"
-          if not os.path.exists(secret_path):
-              return "<h2 style='color:red;'>Vaultのシークレットが見つかりません</h2>"
-          try:
-              creds = load_env_file(secret_path)
-          except Exception as e:
-              return f"<h2 style='color:red;'>シークレット読み込みエラー: {e}</h2>"
+          db_error = False
+      
+          jst = pytz.timezone("Asia/Tokyo")
+      
+          if is_auto_refresh:
+              creds, updated_str, remaining_secs = load_secret(secret_path)
+              if creds is None:
+                  return error_screen(updated_str)
+              remaining = f"{remaining_secs} 秒"
+          else:
+              if not initial_creds:
+                  initial_creds, initial_loaded_time, _ = load_secret(secret_path)
+              creds, updated_str, _ = initial_creds, initial_loaded_time, 0
+              remaining = "Secret期限切れまであと少し・・・"
       
           try:
               connection = psycopg2.connect(
@@ -1641,51 +1893,96 @@ Pod Template:
               )
               cursor = connection.cursor()
               cursor.execute("SELECT name, stock, updated_at FROM inventory")
-              items = [{"name": r[0], "stock": r[1], "updated_at": r[2]} for r in cursor.fetchall()]
+              items = [{"name": r[0], "stock": r[1], "updated_at": r[2].astimezone(jst).strftime('%Y-%m-%d %H:%M:%S')} for r in cursor.fetchall()]
               cursor.close()
               connection.close()
-          except Exception as db_err:
-              return f"<h2 style='color:red;'>DB接続エラー: {db_err}</h2>"
+          except Exception:
+              db_error = True
+              items = []
       
           html_template = '''
           <!DOCTYPE html>
           <html lang="ja">
           <head>
               <meta charset="UTF-8">
-              <title>在庫管理システム</title>
+              <meta http-equiv="refresh" content="3">
+              <title>在庫管理ダッシュボード</title>
               <style>
-                  body { font-family: sans-serif; margin: 40px; background-color: #f9f9f9; }
-                  h1 { color: #333; }
-                  table { width: 80%; border-collapse: collapse; margin-top: 20px; }
-                  th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
-                  th { background-color: #f0f0f0; }
-                  tr:nth-child(even) { background-color: #fdfdfd; }
+                  body { font-family: 'Roboto', sans-serif; background-color: #f0f2f5; padding: 40px; }
+                  .cards { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+                  .card {
+                      background: {{ "white" if not db_error else "#ffe5e5" }};
+                      border-radius: 12px;
+                      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                      padding: 20px;
+                      width: 280px;
+                      border: {{ "none" if not db_error else "2px solid red" }};
+                  }
+                  .section { margin-top: 40px; text-align: center; }
+                  button { font-size: 1em; padding: 10px 20px; margin-bottom: 20px; }
               </style>
           </head>
           <body>
-              <h1>在庫管理ダッシュボード</h1>
-              <table>
-                  <thead>
-                      <tr>
-                          <th>商品名</th>
-                          <th>在庫数</th>
-                          <th>最終更新日</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      {% for item in items %}
-                      <tr>
-                          <td>{{ item['name'] }}</td>
-                          <td>{{ item['stock'] }}</td>
-                          <td>{{ item['updated_at'] }}</td>
-                      </tr>
-                      {% endfor %}
-                  </tbody>
-              </table>
-          </body>
-          </html>
+              <a href='/transit'>🔁 Transit デモへ</a>
+              <a href='/transform'>🔣 Transform デモへ</a>
+              <h1>📦 在庫管理ダッシュボード</h1>
+      
+              <div style="text-align: center;">
+                <form action="/toggle" method="post" style="display: inline-block;">
+                  <button type="submit">自動更新: {{ "ON 🔄" if is_auto_refresh else "OFF ⛔" }}</button>
+                </form>
+              </div>
+              <div class="cards">
+                  {% if db_error %}
+                  <div class="card">
+                      <h3 style="color:red;">⚠ 在庫データ取得エラー</h3>
+                      <p>資格情報が無効になっている可能性があります。</p>
+                      <p style="color:#888;">自動更新をONにしてVault Agentにより資格情報を更新してください。</p>
+                  </div>
+                  {% else %}
+                  {% for item in items %}
+                  <div class="card">
+                      <h3>{{ item['name'] }}</h3>
+                      <div>在庫数: {{ item['stock'] }}</div>
+                      <div>更新日: {{ item['updated_at'] }}</div>
+                  </div>
+                  {% endfor %}
+                  {% endif %}
+              </div>
+              <div class="section">
+                  <h2>📂 Secret ファイルの状態</h2>
+                  <div style="display: flex; justify-content: center;">
+                  <table style="text-align: left;">
+                      <tr><th style="padding: 4px 12px;">ファイルパス</th><td>{{ "/vault/secrets/db-creds" }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">最終更新日時</th><td>{{ updated_str }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">TTL 残り秒数</th><td>{{ remaining }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">DB_USER</th><td>{{ creds.get("DB_USER") }}</td></tr>
+                      <tr><th style="padding: 4px 12px;">DB_PASSWORD</th><td>{{ creds.get("DB_PASSWORD") }}</td></tr>
+                  </table>
+                  </div>
+              </div>
+          </body></html>
           '''
-          return render_template_string(html_template, items=items)
+      
+          return render_template_string(html_template,
+                                        items=items,
+                                        creds=creds,
+                                        updated_str=updated_str,
+                                        remaining=remaining,
+                                        is_auto_refresh=is_auto_refresh,
+                                        db_error=db_error)
+      
+      def error_screen(message):
+          return f'''
+          <html><body style="text-align:center;padding:40px;font-family:sans-serif;">
+          <h1 style="color:red;">現在、在庫情報を取得できません</h1>
+          <p>{message}</p>
+          <p style="color:#888;">自動更新がOFFの場合、一定時間で接続が無効になることがあります。</p>
+          <form action="/toggle" method="post">
+              <button type="submit">自動更新をONにする</button>
+          </form>
+          </body></html>
+          '''
       
       @app.route("/transit", methods=["GET", "POST"])
       def transit_demo():
@@ -1724,26 +2021,117 @@ Pod Template:
       
           return f"""
           <html>
+          <head>
+            <style>
+              body {{ font-family: Arial; }}
+              .container {{ display: flex; gap: 40px; }}
+              .box {{ flex: 1; border: 1px solid #ccc; padding: 20px; }}
+              input, textarea {{ width: 100%; margin-top: 8px; }}
+              textarea {{ height: 100px; }}
+            </style>
+          </head>
           <body>
             <h2>🔐 Vault Transit Engine Demo</h2>
             <a href="/">⬅ DB Secret デモへ戻る</a>
-            <form method="post">
-              <input type="hidden" name="mode" value="encrypt" />
-              <label>平文:</label><br>
-              <input name="encrypt_input" value="{encrypt_input}" /><br><br>
-              <button type="submit">🔒 暗号化</button>
-            </form>
-            <pre>{ciphertext}</pre>
-            <form method="post">
-              <input type="hidden" name="mode" value="decrypt" />
-              <label>暗号文:</label><br>
-              <textarea name="decrypt_input">{decrypt_input}</textarea><br>
-              <button type="submit">🔓 復号化</button>
-            </form>
-            <pre>{plaintext}</pre>
+            <div class="container">
+              <div class="box">
+                <h3>📝 暗号化</h3>
+                <form method="post">
+                  <input type="hidden" name="mode" value="encrypt" />
+                  <label>平文:</label><br>
+                  <input name="encrypt_input" value="{encrypt_input}" /><br><br>
+                  <button type="submit">🔒 暗号化</button>
+                </form>
+                {"<h4>暗号化結果:</h4><textarea readonly>" + ciphertext + "</textarea>" if ciphertext else ""}
+                {"<h4>curl:</h4><textarea readonly>" + encrypt_curl + "</textarea>" if encrypt_curl else ""}
+              </div>
+              <div class="box">
+                <h3>🔓 復号化</h3>
+                <form method="post">
+                  <input type="hidden" name="mode" value="decrypt" />
+                  <label>暗号文:</label><br>
+                  <textarea name="decrypt_input">{decrypt_input}</textarea><br>
+                  <button type="submit">🔓 復号化</button>
+                </form>
+                {"<h4>復号結果:</h4><textarea readonly>" + plaintext + "</textarea>" if plaintext else ""}
+                {"<h4>curl:</h4><textarea readonly>" + decrypt_curl + "</textarea>" if decrypt_curl else ""}
+              </div>
+            </div>
           </body>
           </html>
-          """
+         """
+      
+      @app.route("/transform", methods=["GET", "POST"])
+      def transform_demo():
+        VAULT_ADDR = "http://vault:8200"
+        VAULT_TOKEN = "root"
+        input_value = ""
+        fpe_result = token_result = mask_result = ""
+        fpe_curl = token_curl = mask_curl = ""
+      
+        if request.method == "POST":
+          input_value = request.form["input_value"]
+          role_map = {
+            "fpe": ("fpe-pan-transform", "fpe-pan-role"),
+            "token": ("token-ccn", "token-ccn-role"),
+            "mask": ("mask-pan", "mask-pan-role"),
+          }
+      
+          for ttype in ["fpe", "token", "mask"]:
+            tpl, role = role_map[ttype]
+            res = requests.post(
+              f"{VAULT_ADDR}/v1/transform/encode/{role}",
+              headers={"X-Vault-Token": VAULT_TOKEN},
+              json={"value": input_value, "role": role}
+            ).json()
+            result = res.get("data", {}).get("encoded_value", "")
+            curl = f"""curl -s -H 'X-Vault-Token: {VAULT_TOKEN}' -d '{{"value":"{input_value}","role":"{role}"}}' {VAULT_ADDR}/v1/transform/encode/{role}"""
+            if ttype == "fpe":
+              fpe_result, fpe_curl = result, curl
+            elif ttype == "token":
+              token_result, token_curl = result, curl
+            elif ttype == "mask":
+              mask_result, mask_curl = result, curl
+        return f"""
+        <html>
+        <head>
+        <style>
+          body {{ font-family: Arial; }}
+          .container {{ display: flex; gap: 30px; flex-wrap: wrap; }}
+          .box {{ flex: 1; border: 1px solid #ccc; padding: 20px; min-width: 300px; }}
+          input, textarea {{ width: 100%; margin-top: 8px; }}
+          textarea {{ height: 80px; }}
+        </style>
+        </head>
+        <body>
+        <h2>🔣 Vault Transform Engine Demo</h2>
+        <a href="/">⬅ 戻る</a> |
+        <a href="/transit">🔁 Transit デモへ</a>
+        <form method="post">
+          <label>変換対象データ:</label><br>
+          <input name="input_value" value="{input_value}" /><br><br>
+          <button type="submit">🚀 変換を実行</button>
+        </form>
+        <div class="container">
+          <div class="box">
+          <h3>🔐 FPE (例: クレジットカード番号)</h3>
+          {"<textarea readonly>" + fpe_result + "</textarea>" if fpe_result else ""}
+          {"<h4>curl:</h4><textarea readonly>" + fpe_curl + "</textarea>" if fpe_curl else ""}
+          </div>
+          <div class="box">
+          <h3>🔁 Tokenization (例: マイナンバー)</h3>
+          {"<textarea readonly>" + token_result + "</textarea>" if token_result else ""}
+          {"<h4>curl:</h4><textarea readonly>" + token_curl + "</textarea>" if token_curl else ""}
+          </div>
+          <div class="box">
+          <h3>🔍 Masking 表示</h3>
+          {"<textarea readonly>" + mask_result + "</textarea>" if mask_result else ""}
+          {"<h4>curl:</h4><textarea readonly>" + mask_curl + "</textarea>" if mask_curl else ""}
+          </div>
+        </div>
+        </body>
+        </html>
+        """
       
       if __name__ == "__main__":
           app.run(host="0.0.0.0", port=5000)
@@ -1762,9 +2150,9 @@ Pod Template:
   Node-Selectors:  <none>
   Tolerations:     <none>
 Events:
-  Type    Reason            Age   From                   Message
-  ----    ------            ----  ----                   -------
-  Normal  SuccessfulCreate  118s  replicaset-controller  Created pod: demo-app-64dc955864-6bw7s
+  Type    Reason            Age    From                   Message
+  ----    ------            ----   ----                   -------
+  Normal  SuccessfulCreate  2m14s  replicaset-controller  Created pod: demo-app-5bbb7454c4-vggzf
 
 
 Name:           nginx-tls-5b74c74f46
@@ -1815,9 +2203,9 @@ Pod Template:
   Node-Selectors:  <none>
   Tolerations:     <none>
 Events:
-  Type    Reason            Age   From                   Message
-  ----    ------            ----  ----                   -------
-  Normal  SuccessfulCreate  117s  replicaset-controller  Created pod: nginx-tls-5b74c74f46-dq4rm
+  Type    Reason            Age    From                   Message
+  ----    ------            ----   ----                   -------
+  Normal  SuccessfulCreate  2m12s  replicaset-controller  Created pod: nginx-tls-5b74c74f46-rd5ss
 
 
 Name:           postgres-b85d56587
@@ -1853,9 +2241,9 @@ Pod Template:
   Node-Selectors:  <none>
   Tolerations:     <none>
 Events:
-  Type    Reason            Age   From                   Message
-  ----    ------            ----  ----                   -------
-  Normal  SuccessfulCreate  119s  replicaset-controller  Created pod: postgres-b85d56587-lbhnh
+  Type    Reason            Age    From                   Message
+  ----    ------            ----   ----                   -------
+  Normal  SuccessfulCreate  2m19s  replicaset-controller  Created pod: postgres-b85d56587-t9czm
 
 
 Name:           vault-agent-injector-75f9dfc9c8
@@ -1912,14 +2300,14 @@ Pod Template:
   Node-Selectors:                                          <none>
   Tolerations:                                             <none>
 Events:
-  Type    Reason            Age   From                   Message
-  ----    ------            ----  ----                   -------
-  Normal  SuccessfulCreate  2m8s  replicaset-controller  Created pod: vault-agent-injector-75f9dfc9c8-4jthz
+  Type    Reason            Age    From                   Message
+  ----    ------            ----   ----                   -------
+  Normal  SuccessfulCreate  2m32s  replicaset-controller  Created pod: vault-agent-injector-75f9dfc9c8-pmwrk
 
 
 Name:               vault
 Namespace:          default
-CreationTimestamp:  Sat, 31 May 2025 08:54:14 +0900
+CreationTimestamp:  Thu, 03 Jul 2025 18:44:38 +0900
 Selector:           app.kubernetes.io/instance=vault,app.kubernetes.io/name=vault,component=server
 Labels:             app.kubernetes.io/instance=vault
                     app.kubernetes.io/managed-by=Helm
@@ -1937,7 +2325,7 @@ Pod Template:
   Service Account:  vault
   Containers:
    vault:
-    Image:       hashicorp/vault:1.19.0
+    Image:       hashicorp/vault-enterprise:1.19.5-ent
     Ports:       8200/TCP, 8201/TCP, 8202/TCP
     Host Ports:  0/TCP, 0/TCP, 0/TCP
     Command:
@@ -1959,12 +2347,19 @@ Pod Template:
       HOSTNAME:                   (v1:metadata.name)
       VAULT_CLUSTER_ADDR:        https://$(HOSTNAME).vault-internal:8201
       HOME:                      /home/vault
+      VAULT_LICENSE_PATH:        /vault/license/vault.hclic
       VAULT_DEV_ROOT_TOKEN_ID:   root
       VAULT_DEV_LISTEN_ADDRESS:  [::]:8200
       VAULT_DEV_ROOT_TOKEN_ID:   root
+      VAULT_LICENSE:             
     Mounts:
       /home/vault from home (rw)
+      /vault/license from vault-license (ro)
   Volumes:
+   vault-license:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  vault-enterprise-license
+    Optional:    false
    home:
     Type:          EmptyDir (a temporary directory that shares a pod's lifetime)
     Medium:        
@@ -1973,17 +2368,17 @@ Pod Template:
   Tolerations:     <none>
 Volume Claims:     <none>
 Events:
-  Type    Reason            Age   From                    Message
-  ----    ------            ----  ----                    -------
-  Normal  SuccessfulCreate  2m8s  statefulset-controller  create Pod vault-0 in StatefulSet vault successful
+  Type    Reason            Age    From                    Message
+  ----    ------            ----   ----                    -------
+  Normal  SuccessfulCreate  2m32s  statefulset-controller  create Pod vault-0 in StatefulSet vault successful
 
 
 Name:             postgres-init
 Namespace:        default
-Selector:         batch.kubernetes.io/controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
-Labels:           batch.kubernetes.io/controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+Selector:         batch.kubernetes.io/controller-uid=0752bf69-2224-49c5-93ba-98746f0c83ca
+Labels:           batch.kubernetes.io/controller-uid=0752bf69-2224-49c5-93ba-98746f0c83ca
                   batch.kubernetes.io/job-name=postgres-init
-                  controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+                  controller-uid=0752bf69-2224-49c5-93ba-98746f0c83ca
                   job-name=postgres-init
 Annotations:      <none>
 Parallelism:      1
@@ -1991,14 +2386,14 @@ Completions:      1
 Completion Mode:  NonIndexed
 Suspend:          false
 Backoff Limit:    6
-Start Time:       Sat, 31 May 2025 08:54:23 +0900
-Completed At:     Sat, 31 May 2025 08:54:47 +0900
-Duration:         24s
+Start Time:       Thu, 03 Jul 2025 18:44:54 +0900
+Completed At:     Thu, 03 Jul 2025 18:45:38 +0900
+Duration:         44s
 Pods Statuses:    0 Active (0 Ready) / 1 Succeeded / 0 Failed
 Pod Template:
-  Labels:  batch.kubernetes.io/controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+  Labels:  batch.kubernetes.io/controller-uid=0752bf69-2224-49c5-93ba-98746f0c83ca
            batch.kubernetes.io/job-name=postgres-init
-           controller-uid=ffd71621-d622-482e-bcc0-936896c1eb86
+           controller-uid=0752bf69-2224-49c5-93ba-98746f0c83ca
            job-name=postgres-init
   Containers:
    psql:
@@ -2028,18 +2423,18 @@ Pod Template:
   Node-Selectors:  <none>
   Tolerations:     <none>
 Events:
-  Type    Reason            Age   From            Message
-  ----    ------            ----  ----            -------
-  Normal  SuccessfulCreate  119s  job-controller  Created pod: postgres-init-t2828
-  Normal  Completed         95s   job-controller  Job completed
+  Type    Reason            Age    From            Message
+  ----    ------            ----   ----            -------
+  Normal  SuccessfulCreate  2m16s  job-controller  Created pod: postgres-init-p4jfq
+  Normal  Completed         92s    job-controller  Job completed
 
 
 Name:             vault-init
 Namespace:        default
-Selector:         batch.kubernetes.io/controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
-Labels:           batch.kubernetes.io/controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+Selector:         batch.kubernetes.io/controller-uid=af9e4924-abf6-447f-86de-be758d21edf3
+Labels:           batch.kubernetes.io/controller-uid=af9e4924-abf6-447f-86de-be758d21edf3
                   batch.kubernetes.io/job-name=vault-init
-                  controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+                  controller-uid=af9e4924-abf6-447f-86de-be758d21edf3
                   job-name=vault-init
 Annotations:      <none>
 Parallelism:      1
@@ -2047,14 +2442,12 @@ Completions:      1
 Completion Mode:  NonIndexed
 Suspend:          false
 Backoff Limit:    6
-Start Time:       Sat, 31 May 2025 08:54:23 +0900
-Completed At:     Sat, 31 May 2025 08:54:41 +0900
-Duration:         18s
-Pods Statuses:    0 Active (0 Ready) / 1 Succeeded / 0 Failed
+Start Time:       Thu, 03 Jul 2025 18:44:52 +0900
+Pods Statuses:    1 Active (0 Ready) / 0 Succeeded / 0 Failed
 Pod Template:
-  Labels:           batch.kubernetes.io/controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+  Labels:           batch.kubernetes.io/controller-uid=af9e4924-abf6-447f-86de-be758d21edf3
                     batch.kubernetes.io/job-name=vault-init
-                    controller-uid=0a4f39f0-0a1a-4fb8-826a-f6cf48da483a
+                    controller-uid=af9e4924-abf6-447f-86de-be758d21edf3
                     job-name=vault-init
   Service Account:  vault
   Containers:
@@ -2155,6 +2548,40 @@ Pod Template:
       
       echo "Vault PKI Init Complete"
       
+      echo "Enable Transform engine"
+      vault secrets enable transform || true
+      
+      echo "Configure FPE for PAN"
+       vault write transform/transformation/fpe-pan-transform \
+        type=fpe \
+        template="builtin/creditcardnumber" \
+        allowed_roles="fpe-pan-role" \
+        tweak_source="internal"
+      
+      vault write transform/role/fpe-pan-role \
+        transformations=fpe-pan-transform
+      
+      echo "Configure Tokenization for Credit Card Number Format"
+       vault write transform/transformations/tokenization/token-ccn \
+        max_ttl=24h \
+        allowed_roles=token-ccn-role
+      
+      vault write transform/role/token-ccn-role \
+        transformations=token-ccn
+      
+      ## Masking for PAN display
+      echo "Configure Masking for PAN"
+      vault write transform/transformation/mask-pan \
+        type=masking \
+        template="builtin/creditcardnumber" \
+        masking_character="*" \
+        allowed_roles=mask-pan-role
+      
+      vault write transform/role/mask-pan-role \
+        transformations=mask-pan
+      
+      echo "✅ Vault Transform configuration complete"
+      
     Environment:
       VAULT_TOKEN:  root
     Mounts:
@@ -2172,7 +2599,6 @@ Pod Template:
   Node-Selectors:  <none>
   Tolerations:     <none>
 Events:
-  Type    Reason            Age   From            Message
-  ----    ------            ----  ----            -------
-  Normal  SuccessfulCreate  119s  job-controller  Created pod: vault-init-jjcl5
-  Normal  Completed         101s  job-controller  Job completed
+  Type    Reason            Age    From            Message
+  ----    ------            ----   ----            -------
+  Normal  SuccessfulCreate  2m18s  job-controller  Created pod: vault-init-7d7lx

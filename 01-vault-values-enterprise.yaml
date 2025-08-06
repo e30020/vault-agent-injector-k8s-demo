@@ -1,0 +1,25 @@
+server:
+  enterpriseLicense:
+    secretName: "vault-enterprise-license"
+    secretKey: "vault.hclic"
+    
+  image:
+    repository: hashicorp/vault-enterprise
+    tag: "1.19.5-ent"
+
+  dev:
+    enabled: true
+  extraEnvironmentVars:
+    VAULT_DEV_ROOT_TOKEN_ID: "root"
+    VAULT_LICENSE: ""
+  dataStorage:
+    enabled: false
+  serviceAccount:
+    create: false
+    name: vault
+
+injector:
+  enabled: true
+  authPath: "auth/kubernetes"
+  defaultVaultRole: "myapp-role"
+  templates: {} 

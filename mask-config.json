@@ -1,0 +1,19 @@
+
+{
+
+ "type": "masking",
+
+ "template": "mask-pan-template",
+
+ "masking_character": "*",
+
+ "masking_character_count": 8,
+
+ "mask_left": 4,
+
+ "mask_right": 4,
+
+ "allowed_roles": ["mask-pan-role"]
+
+}
+

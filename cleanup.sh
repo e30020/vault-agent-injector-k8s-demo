@@ -21,6 +21,7 @@ kubectl delete replicaset -l app=postgres -n $NAMESPACE --ignore-not-found --for
 echo "🧹 Deleting Vault Init Job..."
 kubectl delete job vault-init -n $NAMESPACE --ignore-not-found
 kubectl delete -f 06-vault-init-job.yaml --ignore-not-found
+kubectl delete -f 06-vault-init-job-enterprise.yaml --ignore-not-found
 kubectl delete pod -l job-name=vault-init -n $NAMESPACE --ignore-not-found --force --grace-period=0
 
 echo "🧹 Deleting Postgres Init Job..."
